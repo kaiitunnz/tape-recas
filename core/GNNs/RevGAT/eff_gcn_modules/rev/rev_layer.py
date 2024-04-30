@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 try:
-    from torch_geometric.nn import GCNConv, SAGEConv, GATConv
-    from gcn_lib.sparse.torch_nn import norm_layer
+    from torch_geometric.nn import GCNConv, SAGEConv, GATConv       # type: ignore
+    from gcn_lib.sparse.torch_nn import norm_layer      # type: ignore
 except:
     print("An import exception occurred")
 

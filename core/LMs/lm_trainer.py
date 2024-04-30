@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from transformers import AutoTokenizer, AutoModel, TrainingArguments, Trainer, IntervalStrategy
+from transformers import AutoTokenizer, AutoModel, TrainingArguments, Trainer, IntervalStrategy     # type: ignore
 from core.LMs.model import BertClassifier, BertClaInfModel
 from core.data_utils.dataset import Dataset
 from core.data_utils.load import load_data
@@ -9,7 +9,7 @@ from core.utils import init_path, time_logger
 
 
 def compute_metrics(p):
-    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import accuracy_score     # type: ignore
     pred, labels = p
     pred = np.argmax(pred, axis=1)
     accuracy = accuracy_score(y_true=labels, y_pred=pred)
@@ -148,7 +148,7 @@ class LMTrainer():
         trainer = Trainer(model=inf_model, args=inference_args)
         trainer.predict(self.inf_dataset)
         if "ogbn" in self.dataset_name:
-            from ogb.nodeproppred import Evaluator
+            from ogb.nodeproppred import Evaluator      # type: ignore
             _evaluator = Evaluator(name=self.dataset_name)
         else:
             from core.GNNs.gnn_utils import Evaluator
