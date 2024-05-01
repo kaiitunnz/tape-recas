@@ -1,5 +1,5 @@
 
-import dgl
+import dgl      # type: ignore
 import torch
 from torch.utils.data import Dataset as TorchDataset
 

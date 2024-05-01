@@ -1,6 +1,9 @@
+from typing import Dict, Tuple
+
 import torch
 
 from core.GNNs.gnn_trainer import GNNTrainer
+from core.GNNs.gnn_utils import get_ckpt_dir
 from core.GNNs.dgl_gnn_trainer import DGLGNNTrainer
 from core.data_utils.load import load_data
 
@@ -22,6 +25,8 @@ class EnsembleTrainer():
         self.feature_type = cfg.gnn.train.feature_type
         self.epochs = cfg.gnn.train.epochs
         self.weight_decay = cfg.gnn.train.weight_decay
+
+        self.ckpt_dir = get_ckpt_dir(self.dataset_name)
 
         # ! Load data
         data, _ = load_data(self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed)
@@ -57,17 +62,18 @@ class EnsembleTrainer():
         res = {'val_acc': val_acc, 'test_acc': test_acc}
         return res
 
-    def train(self):
-        all_pred = []
+    def train(self) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+        all_pred = {}
         all_acc = {}
         feature_types = self.feature_type.split('_')
         for feature_type in feature_types:
             trainer = self.TRAINER(self.cfg, feature_type)
             trainer.train()
             pred, acc = trainer.eval_and_save()
-            all_pred.append(pred)
+            all_pred[feature_type] = pred
             all_acc[feature_type] = acc
-        pred_ensemble = sum(all_pred)/len(all_pred)
+        pred_ensemble = sum(all_pred.values())/len(all_pred)
         acc_ensemble = self.eval(pred_ensemble)
+        all_pred['ensemble'] = pred_ensemble
         all_acc['ensemble'] = acc_ensemble
-        return all_acc
+        return all_pred, all_acc

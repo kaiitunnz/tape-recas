@@ -1,9 +1,10 @@
-import torch
 from time import time
+from typing import Dict, Tuple
+
+import torch
 import numpy as np
 
-
-from core.GNNs.gnn_utils import EarlyStopping
+from core.GNNs.gnn_utils import EarlyStopping, get_ckpt_dir
 from core.data_utils.load import load_data, load_gpt_preds
 from core.utils import time_logger
 
@@ -95,7 +96,8 @@ class GNNTrainer():
                                for p in self.model.parameters() if p.requires_grad)
 
         print(f"\nNumber of parameters: {trainable_params}")
-        self.ckpt = f"output/{self.dataset_name}/{self.gnn_model_name}.pt"
+        self.ckpt_dir = get_ckpt_dir(self.dataset_name)
+        self.ckpt = f"{self.ckpt_dir}/{self.gnn_model_name}_{self.feature_type}.pt"
         self.stopper = EarlyStopping(
             patience=cfg.gnn.train.early_stop, path=self.ckpt) if cfg.gnn.train.early_stop > 0 else None
         self.loss_func = torch.nn.CrossEntropyLoss()
@@ -159,8 +161,8 @@ class GNNTrainer():
 
         return self.model
 
-    @ torch.no_grad()
-    def eval_and_save(self):
+    @torch.no_grad()
+    def eval_and_save(self) -> Tuple[torch.Tensor, Dict[str, float]]:
         torch.save(self.model.state_dict(), self.ckpt)
         val_acc, test_acc, logits = self._evaluate()
         print(

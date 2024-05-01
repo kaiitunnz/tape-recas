@@ -1,6 +1,6 @@
 import os
 import argparse
-from yacs.config import CfgNode as CN
+from yacs.config import CfgNode as CN       # type: ignore
 
 
 def set_cfg(cfg):
@@ -15,7 +15,8 @@ def set_cfg(cfg):
     # Whether fix the running seed to remove randomness
     cfg.seed = None
     # Number of runs with random init
-    cfg.runs = 4
+    # cfg.runs = 4
+    cfg.runs = 1
     cfg.gnn = CN()
     cfg.lm = CN()
 
@@ -54,7 +55,8 @@ def set_cfg(cfg):
     # ------------------------------------------------------------------------ #
     cfg.lm.model = CN()
     # LM model name
-    cfg.lm.model.name = 'microsoft/deberta-base'
+    # cfg.lm.model.name = 'microsoft/deberta-base'
+    cfg.lm.model.name = 'FacebookAI/roberta-base'
     cfg.lm.model.feat_shrink = ""
 
     # ------------------------------------------------------------------------ #
@@ -84,6 +86,13 @@ def set_cfg(cfg):
     # Whether or not to use the gpt responses (i.e., explanation and prediction) as text input
     # If not, use the original text attributes (i.e., title and abstract)
     cfg.lm.train.use_gpt = False
+
+    # ------------------------------------------------------------------------ #
+    # C&S options
+    # ------------------------------------------------------------------------ #
+    cfg.cas = CN()
+    cfg.cas.use_lm_pred = False
+    cfg.cas.feature_types = ["TA", "P", "E", None]
 
     return cfg
 

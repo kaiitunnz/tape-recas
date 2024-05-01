@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from transformers import PreTrainedModel
-from transformers.modeling_outputs import TokenClassifierOutput
+from transformers import PreTrainedModel        # type: ignore
+from transformers.modeling_outputs import TokenClassifierOutput     # type: ignore
 from core.utils import init_random_state
 
 
@@ -64,7 +64,7 @@ class BertClaInfModel(PreTrainedModel):
                 attention_mask=None,
                 labels=None,
                 return_dict=None,
-                node_id=None):
+                node_id=None) -> TokenClassifierOutput:
 
         # Extract outputs from the model
         bert_outputs = self.bert_classifier.bert_encoder(input_ids=input_ids,
