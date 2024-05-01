@@ -20,7 +20,7 @@ def get_pred_fname(
     dataset_name: str, lm_model_name: str, gnn_model_name: str, feature_type: str, seed: int
 ) -> str:
     return (
-        f"{get_ckpt_dir(dataset_name)}"
+        f"{get_ckpt_dir(dataset_name)}/"
         f"{lm_model_name}_"
         f"{gnn_model_name}_"
         f"{feature_type}_"
