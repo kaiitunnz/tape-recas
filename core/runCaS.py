@@ -21,12 +21,12 @@ def run(cfg):
     result_df = all_result_df.groupby("method")
     avg_df = result_df.mean()
     std_df = result_df.std()
-    for _, row in result_df.iterrows():
+    for (method, avg_row), (_, std_row) in zip(avg_df.iterrows(), std_df.iterrows()):
         print(
-            f'[{row["method"]}] '
-            f'TrainACC: {row["train_acc"]:.4f} ± {row["train_acc"]:.4f}, '
-            f'ValACC: {row["valid_acc"]:.4f} ± {row["valid_acc"]}, '
-            f'TestACC: {row["test_acc"]:.4f} ± {row["test_acc"]:.4f}'
+            f'[{method}] '
+            f'TrainACC: {avg_row["train_acc"]:.4f} ± {std_row["train_acc"]:.4f}, '
+            f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]}, '
+            f'TestACC: {avg_row["test_acc"]:.4f} ± {std_row["test_acc"]:.4f}'
         )
     print(f"Running time: {round((end-start)/len(seeds), 2)}s")
 

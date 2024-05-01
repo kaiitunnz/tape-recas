@@ -68,9 +68,9 @@ class CaSRunner:
 
     def _get_method_name(self, is_original: bool) -> str:
         method_name = (
-            self.lm_model_name
+            f"{self.lm_model_name}+{self.feature_type}"
             if self.use_lm_pred
-            else f"{self.lm_model_name}+{self.gnn_model_name}"
+            else f"{self.lm_model_name}+{self.gnn_model_name}+{self.feature_type}"
         )
         return method_name if is_original else method_name + "+C&S"
 
@@ -95,7 +95,7 @@ class CaSRunner:
         idx = self.split_idx[split]
         return self.evaluator.eval(
             {
-                "y_true": self.data.y[idx],
+                "y_true": self.data.y[idx].view((-1, 1)),
                 "y_pred": preds[idx].argmax(dim=-1, keepdim=True),
             }
         )["acc"]
@@ -142,7 +142,7 @@ class CaSRunner:
         weights = torch.tensor([[1 / (2**i) for i in range(topk)]]).expand(
             self.num_nodes, -1
         )
-        logits.scatter_(-1, topk_preds - 1, weights)
+        logits.scatter_(-1, torch.clamp(topk_preds - 1, 0), weights)
         return logits
 
     def _load_lm_pred(self) -> torch.Tensor:
