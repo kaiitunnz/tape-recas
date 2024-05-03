@@ -11,4 +11,4 @@ pip install transformers
 pip install --upgrade accelerate
 
 # For typing
-pip install pandas-stubs
+# pip install pandas-stubs
