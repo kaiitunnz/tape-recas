@@ -62,5 +62,5 @@ gpt_preds/
 # logs and results
 logs/
 results/
-output/
-prt_lm/
+# output/
+# prt_lm/
