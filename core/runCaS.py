@@ -18,8 +18,9 @@ def run(cfg):
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
+    print(all_result_df.isnull().values.any())
     result_df = all_result_df.groupby("method")
-    print(result_df.isnull().values.any())
+    print(result_df)
     avg_df = result_df.mean()
     std_df = result_df.std()
     for (method, avg_row), (_, std_row) in zip(avg_df.iterrows(), std_df.iterrows()):
