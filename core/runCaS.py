@@ -20,7 +20,7 @@ def run(cfg):
 
     result_df = all_result_df.groupby("method")
     avg_df = result_df.mean()
-    std_df = result_df.std()
+    std_df = result_df.std(ddof=0)
     for (method, avg_row), (_, std_row) in zip(avg_df.iterrows(), std_df.iterrows()):
         print(
             f'[{method}] '
