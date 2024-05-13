@@ -39,7 +39,7 @@ class CaSRunner:
         data.y = data.y.squeeze()
 
         self.data = data
-        self.split_idx = data.split_idx
+        self.split_idx: Dict[str, torch.Tensor] = data.split_idx
 
         self.evaluator = Evaluator(name=self.dataset_name)
 
@@ -92,7 +92,7 @@ class CaSRunner:
         )
 
     def _eval(self, preds: torch.Tensor, split: str) -> float:
-        idx = self.split_idx[split]
+        idx = self.split_idx[split].int()
         return self.evaluator.eval(
             {
                 "y_true": self.data.y[idx].view((-1, 1)),

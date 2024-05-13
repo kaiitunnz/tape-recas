@@ -9,6 +9,8 @@ from tqdm import tqdm  # type: ignore
 
 from core.GNNs.gnn_utils import Evaluator
 
+_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def process_adj(data: BaseData) -> Tuple[SparseTensor, torch.Tensor]:
     N = data.num_nodes
@@ -60,7 +62,7 @@ def double_correlation_autoscale(
     num_propagations2: int,
     scale: float = 1.0,
     train_only: bool = False,
-    device: str = "cuda",
+    device: str = _DEVICE,
     display: bool = True,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     if train_only:
@@ -116,7 +118,7 @@ def only_outcome_correlation(
     alpha: float,
     num_propagations: int,
     labels: List[str],
-    device: str = "cuda",
+    device: str = _DEVICE,
     display: bool = True,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     res_result = model_out.clone()
@@ -149,7 +151,7 @@ def double_correlation_fixed(
     num_propagations2: int,
     scale: float = 1.0,
     train_only: bool = False,
-    device: str = "cuda",
+    device: str = _DEVICE,
     display: bool = True,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     if train_only:
@@ -234,9 +236,9 @@ def pre_residual_correlation(
     labels = labels.long()
     model_out = model_out.cpu()
     label_idx = label_idx.cpu()
-    c = labels.max() + 1
+    c = int((labels.max() + 1).item())
     n = labels.shape[0]
-    y = torch.zeros(n, int(c.item()))
+    y = torch.zeros(n, c)
     y[label_idx] = (
         F.one_hot(labels[label_idx], c).float().squeeze(1) - model_out[label_idx]
     )
@@ -250,7 +252,7 @@ def general_outcome_correlation(
     num_propagations: int,
     post_step: Callable[[torch.Tensor], torch.Tensor],
     alpha_term: bool,
-    device: str = "cuda",
+    device: str = _DEVICE,
     display: bool = True,
 ):
     """general outcome correlation. alpha_term = True for outcome correlation, alpha_term = False for residual correlation"""
@@ -275,7 +277,7 @@ def pre_outcome_correlation(
     labels = labels.cpu()
     model_out = model_out.cpu()
     label_idx = label_idx.cpu()
-    c = labels.max() + 1
+    c = int((labels.max() + 1).item())
     y = model_out.clone()
     if len(label_idx) > 0:
         y[label_idx] = F.one_hot(labels[label_idx], c).float().squeeze(1)
