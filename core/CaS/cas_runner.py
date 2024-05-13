@@ -1,5 +1,6 @@
 from typing import Any, Callable, Dict, Optional, Tuple
 
+import optuna
 import numpy as np
 import pandas as pd
 import torch
@@ -30,24 +31,22 @@ class CaSRunner:
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
 
-        data, num_classes = load_data(
-            self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed
-        )
+        data, num_classes = load_data(self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed)
 
         self.num_nodes = data.y.shape[0]
         self.num_classes = num_classes
         data.y = data.y.squeeze()
 
         self.data = data
-        self.split_idx: Dict[str, torch.Tensor] = data.split_idx
+        self.split_idx = data.split_idx
 
         self.evaluator = Evaluator(name=self.dataset_name)
 
-    def run(self) -> pd.DataFrame:
+    def run(self, params_dict) -> pd.DataFrame:
         adj, D_isqrt = process_adj(self.data)
         normalized_adjs = gen_normalized_adjs(adj, D_isqrt)
 
-        cas_params, cas_fn = self._get_params(normalized_adjs)
+        cas_params, cas_fn = self._get_params(normalized_adjs, params_dict)
 
         if self.use_lm_pred:
             model_preds = self._load_lm_pred()
@@ -56,13 +55,9 @@ class CaSRunner:
 
         result_df = pd.DataFrame()
         eval_results = self.evaluate_original_preds(model_preds)
-        result_df = self._add_eval_results(
-            result_df, self._get_method_name(True), eval_results
-        )
+        result_df = self._add_eval_results(result_df, self._get_method_name(True), eval_results)
         eval_results = self.evaluate_cas_preds(model_preds, cas_params, cas_fn)
-        result_df = self._add_eval_results(
-            result_df, self._get_method_name(False), eval_results
-        )
+        result_df = self._add_eval_results(result_df, self._get_method_name(False), eval_results)
 
         return result_df
 
@@ -92,7 +87,7 @@ class CaSRunner:
         )
 
     def _eval(self, preds: torch.Tensor, split: str) -> float:
-        idx = self.split_idx[split].int()
+        idx = self.split_idx[split]
         return self.evaluator.eval(
             {
                 "y_true": self.data.y[idx].view((-1, 1)),
@@ -109,9 +104,7 @@ class CaSRunner:
     ) -> Dict[str, float]:
         self._validate_preds(preds)
         _, result = cas_fn(self.data, preds, self.split_idx, **cas_params)
-        return {
-            split: self._eval(result, split) for split in ["train", "valid", "test"]
-        }
+        return {split: self._eval(result, split) for split in ["train", "valid", "test"]}
 
     def _validate_preds(self, preds: torch.Tensor):
         if (preds.sum(dim=-1) - 1).abs().max() > 1e-1:
@@ -120,28 +113,30 @@ class CaSRunner:
     def _get_params(
         self,
         normalized_adjs: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
-    ) -> Tuple[Dict[str, Any], _CaSFnType]:
+        params_dict: Dict[str, Any],
+    ) -> Tuple[Dict[str, Any], Any]:
         DAD, DA, AD = normalized_adjs
-        # Now we use the default hyperparameters. Need fine-tuning. (C&S used Optuna.)
-        params_dict = {
+
+        # Sample hyperparameters using Optuna trial
+        params_dict_ = {
             "train_only": True,
-            "alpha1": 1.0,
-            "alpha2": 0.8,
-            "scale": 10.0,
-            "A1": DAD,
-            "A2": DA,
-            "num_propagations1": 50,
-            "num_propagations2": 50,
+            "alpha1": params_dict.get("alpha1", 1.0),
+            "alpha2": params_dict.get("alpha2", 0.8),
+            "scale": params_dict.get("scale", 10.0),
+            "A1": normalized_adjs[params_dict.get("A1", 0)],
+            "A2": normalized_adjs[params_dict.get("A2", 1)],
+            "num_propagations1": params_dict.get("num_propagations1", 50),
+            "num_propagations2": params_dict.get("num_propagations2", 50),
         }
+
         cas_fn = double_correlation_fixed
-        return params_dict, cas_fn
+
+        return params_dict_, cas_fn
 
     def _topk_preds_to_logits(self, topk_preds: torch.Tensor) -> torch.Tensor:
         topk = topk_preds.size(-1)
         logits = torch.zeros(self.num_nodes, self.num_classes)
-        weights = torch.tensor([[1 / (2**i) for i in range(topk)]]).expand(
-            self.num_nodes, -1
-        )
+        weights = torch.tensor([[1 / (2**i) for i in range(topk)]]).expand(self.num_nodes, -1)
         logits.scatter_(-1, torch.clamp(topk_preds - 1, 0), weights)
         return logits
 
@@ -165,16 +160,12 @@ class CaSRunner:
 
         if self.feature_type == "TA":
             print("Loading LM predictions (title and abstract) ...")
-            LM_pred_path = (
-                f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
-            )
+            LM_pred_path = f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
             print(f"LM_pred_path: {LM_pred_path}")
             logits = load_TA_E_logits(LM_pred_path)
         elif self.feature_type == "E":
             print("Loading LM predictions (explanations) ...")
-            LM_pred_path = (
-                f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
-            )
+            LM_pred_path = f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
             print(f"LM_pred_path: {LM_pred_path}")
             logits = load_TA_E_logits(LM_pred_path)
         elif self.feature_type == "P":
@@ -182,12 +173,8 @@ class CaSRunner:
             logits = load_P_logits()
         elif self.feature_type == None:
             print("Loading an ensemble of LM predictions ...")
-            LM_TA_pred_path = (
-                f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
-            )
-            LM_E_pred_path = (
-                f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
-            )
+            LM_TA_pred_path = f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
+            LM_E_pred_path = f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
             logits = torch.stack(
                 [
                     load_TA_E_logits(LM_TA_pred_path),

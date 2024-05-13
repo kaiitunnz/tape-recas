@@ -1,5 +1,5 @@
 import time
-
+import optuna
 import pandas as pd
 
 from core.config import cfg, update_cfg
@@ -14,7 +14,7 @@ def run(cfg):
         cfg.seed = seed
         for feature_type in cfg.cas.feature_types:
             runner = CaSRunner(cfg, feature_type)
-            tmp_result_df = runner.run()
+            tmp_result_df = runner.run(dict())
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
@@ -23,7 +23,7 @@ def run(cfg):
     std_df = result_df.std()
     for (method, avg_row), (_, std_row) in zip(avg_df.iterrows(), std_df.iterrows()):
         print(
-            f'[{method}] '
+            f"[{method}] "
             f'TrainACC: {avg_row["train_acc"]:.4f} ± {std_row["train_acc"]:.4f}, '
             f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]}, '
             f'TestACC: {avg_row["test_acc"]:.4f} ± {std_row["test_acc"]:.4f}'
