@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 gpt_responses
+logs
+results
 
 # C extensions
 *.so

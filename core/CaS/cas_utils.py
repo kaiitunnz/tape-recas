@@ -7,8 +7,6 @@ from torch_geometric.utils import to_undirected  # type: ignore
 from torch_sparse import SparseTensor  # type: ignore
 from tqdm import tqdm  # type: ignore
 
-from core.GNNs.gnn_utils import Evaluator
-
 _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -63,7 +61,7 @@ def double_correlation_autoscale(
     scale: float = 1.0,
     train_only: bool = False,
     device: str = _DEVICE,
-    display: bool = True,
+    display: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     if train_only:
         label_idx = torch.cat([split_idx["train"]])
@@ -119,7 +117,7 @@ def only_outcome_correlation(
     num_propagations: int,
     labels: List[str],
     device: str = _DEVICE,
-    display: bool = True,
+    display: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     res_result = model_out.clone()
     label_idxs = get_labels_from_name(labels, split_idx)
@@ -152,7 +150,7 @@ def double_correlation_fixed(
     scale: float = 1.0,
     train_only: bool = False,
     device: str = _DEVICE,
-    display: bool = True,
+    display: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     if train_only:
         label_idx = torch.cat([split_idx["train"]])
@@ -253,7 +251,7 @@ def general_outcome_correlation(
     post_step: Callable[[torch.Tensor], torch.Tensor],
     alpha_term: bool,
     device: str = _DEVICE,
-    display: bool = True,
+    display: bool = False,
 ):
     """general outcome correlation. alpha_term = True for outcome correlation, alpha_term = False for residual correlation"""
     adj = adj.to(device)

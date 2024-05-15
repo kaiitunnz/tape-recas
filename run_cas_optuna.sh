@@ -1,7 +1,15 @@
-for dataset in "arxiv_2023"
+datasets=("arxiv_2023")
+results="results"
+
+rm -r $results
+mkdir $results
+
+for dataset in "${datasets[@]}"
 do
-    python -m core.runCaS_optuna dataset $dataset gnn.model.name MLP seed 0 >> ${dataset}_mlp.txt
-    python -m core.runCaS_optuna dataset $dataset gnn.model.name GCN seed 0 >> ${dataset}_gcn.txt
-    python -m core.runCaS_optuna dataset $dataset gnn.model.name SAGE seed 0 >> ${dataset}_sage.txt
-    python -m core.runCaS_optuna dataset $dataset gnn.model.name RevGAT gnn.train.lr 0.002 gnn.train.dropout 0.5 seed 0 >> ${dataset}_revgat.txt
+    python -m core.runCaS_optuna dataset $dataset gnn.model.name MLP seed 0 cas.optuna.n_jobs 4 >> "${results}/${dataset}_mlp.txt" 2>> "${results}/${dataset}_mlp.err" &
+    python -m core.runCaS_optuna dataset $dataset gnn.model.name GCN seed 0 cas.optuna.n_jobs 4 >> "${results}/${dataset}_gcn.txt" 2>> "${results}/${dataset}_gcn.err" &
+    python -m core.runCaS_optuna dataset $dataset gnn.model.name SAGE seed 0 cas.optuna.n_jobs 4 >> "${results}/${dataset}_sage.txt" 2>> "${results}/${dataset}_sage.err" &
+    python -m core.runCaS_optuna dataset $dataset gnn.model.name RevGAT seed 0 cas.optuna.n_jobs 4 >> "${results}/${dataset}_revgat.txt" 2>> "${results}/${dataset}_revgat.err" &
 done
+
+wait

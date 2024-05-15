@@ -94,6 +94,12 @@ def set_cfg(cfg):
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
 
+    # ------------------------------------------------------------------------ #
+    # C&S Optuna options
+    # ------------------------------------------------------------------------ #
+    cfg.cas.optuna = CN()
+    cfg.cas.optuna.n_jobs = 1
+
     return cfg
 
 

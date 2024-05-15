@@ -8,15 +8,10 @@ from torch.functional import F
 
 from yacs.config import CfgNode as CN  # type: ignore
 
+import core.CaS.cas_utils as cas_utils
 from core.GNNs.gnn_utils import Evaluator, get_pred_fname
 from core.data_utils.load import load_data, load_gpt_preds
-from core.CaS.cas_utils import (
-    double_correlation_autoscale,
-    double_correlation_fixed,
-    gen_normalized_adjs,
-    only_outcome_correlation,
-    process_adj,
-)
+from core.CaS.cas_utils import gen_normalized_adjs, process_adj
 
 _CaSFnType = Callable[..., Tuple[torch.Tensor, torch.Tensor]]
 
@@ -31,7 +26,9 @@ class CaSRunner:
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
 
-        data, num_classes = load_data(self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed)
+        data, num_classes = load_data(
+            self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed
+        )
 
         self.num_nodes = data.y.shape[0]
         self.num_classes = num_classes
@@ -42,7 +39,7 @@ class CaSRunner:
 
         self.evaluator = Evaluator(name=self.dataset_name)
 
-    def run(self, params_dict) -> pd.DataFrame:
+    def run(self, params_dict: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
         adj, D_isqrt = process_adj(self.data)
         normalized_adjs = gen_normalized_adjs(adj, D_isqrt)
 
@@ -55,17 +52,22 @@ class CaSRunner:
 
         result_df = pd.DataFrame()
         eval_results = self.evaluate_original_preds(model_preds)
-        result_df = self._add_eval_results(result_df, self._get_method_name(True), eval_results)
+        result_df = self._add_eval_results(
+            result_df, self._get_method_name(True), eval_results
+        )
         eval_results = self.evaluate_cas_preds(model_preds, cas_params, cas_fn)
-        result_df = self._add_eval_results(result_df, self._get_method_name(False), eval_results)
+        result_df = self._add_eval_results(
+            result_df, self._get_method_name(False), eval_results
+        )
 
         return result_df
 
     def _get_method_name(self, is_original: bool) -> str:
+        feature_type = "Ensemble" if self.feature_type is None else self.feature_type
         method_name = (
-            f"{self.lm_model_name}+{self.feature_type}"
+            f"{self.lm_model_name}+{feature_type}"
             if self.use_lm_pred
-            else f"{self.lm_model_name}+{self.gnn_model_name}+{self.feature_type}"
+            else f"{self.lm_model_name}+{self.gnn_model_name}+{feature_type}"
         )
         return method_name if is_original else method_name + "+C&S"
 
@@ -104,7 +106,9 @@ class CaSRunner:
     ) -> Dict[str, float]:
         self._validate_preds(preds)
         _, result = cas_fn(self.data, preds, self.split_idx, **cas_params)
-        return {split: self._eval(result, split) for split in ["train", "valid", "test"]}
+        return {
+            split: self._eval(result, split) for split in ["train", "valid", "test"]
+        }
 
     def _validate_preds(self, preds: torch.Tensor):
         if (preds.sum(dim=-1) - 1).abs().max() > 1e-1:
@@ -113,30 +117,56 @@ class CaSRunner:
     def _get_params(
         self,
         normalized_adjs: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
-        params_dict: Dict[str, Any],
+        params_dict: Optional[Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Any]:
-        DAD, DA, AD = normalized_adjs
+        params_dict = {} if params_dict is None else params_dict.copy()
+        cas_fn = params_dict.pop("cas_fn", "double_correlation_fixed")
+        if cas_fn == "double_correlation_autoscale":
+            params_dict_ = {
+                "train_only": True,
+                "alpha1": 1.0,
+                "alpha2": 0.8,
+                "A1": normalized_adjs[0],
+                "A2": normalized_adjs[1],
+                "num_propagations1": 50,
+                "num_propagations2": 50,
+            }
+            params_dict["A1"] = normalized_adjs[params_dict["A1"]]
+            params_dict["A2"] = normalized_adjs[params_dict["A2"]]
+        elif cas_fn == "double_correlation_fixed":
+            params_dict_ = {
+                "train_only": True,
+                "alpha1": 1.0,
+                "alpha2": 0.8,
+                "scale": 10.0,
+                "A1": normalized_adjs[0],
+                "A2": normalized_adjs[1],
+                "num_propagations1": 50,
+                "num_propagations2": 50,
+            }
+            params_dict["A1"] = normalized_adjs[params_dict["A1"]]
+            params_dict["A2"] = normalized_adjs[params_dict["A2"]]
+        elif cas_fn == "only_outcome_correlation":
+            params_dict_ = {
+                'labels': ['train'],
+                "alpha": 0.8,
+                "A": normalized_adjs[0],
+                "num_propagations": 50,
+            }
+            params_dict["A"] = normalized_adjs[params_dict["A"]]
+        else:
+            raise ValueError(f"Unknown CaS function: {cas_fn}")
 
-        # Sample hyperparameters using Optuna trial
-        params_dict_ = {
-            "train_only": True,
-            "alpha1": params_dict.get("alpha1", 1.0),
-            "alpha2": params_dict.get("alpha2", 0.8),
-            "scale": params_dict.get("scale", 10.0),
-            "A1": normalized_adjs[params_dict.get("A1", 0)],
-            "A2": normalized_adjs[params_dict.get("A2", 1)],
-            "num_propagations1": params_dict.get("num_propagations1", 50),
-            "num_propagations2": params_dict.get("num_propagations2", 50),
-        }
+        params_dict_.update(params_dict)
 
-        cas_fn = double_correlation_fixed
-
-        return params_dict_, cas_fn
+        return params_dict_, getattr(cas_utils, cas_fn)
 
     def _topk_preds_to_logits(self, topk_preds: torch.Tensor) -> torch.Tensor:
         topk = topk_preds.size(-1)
         logits = torch.zeros(self.num_nodes, self.num_classes)
-        weights = torch.tensor([[1 / (2**i) for i in range(topk)]]).expand(self.num_nodes, -1)
+        weights = torch.tensor([[1 / (2**i) for i in range(topk)]]).expand(
+            self.num_nodes, -1
+        )
         logits.scatter_(-1, torch.clamp(topk_preds - 1, 0), weights)
         return logits
 
@@ -160,12 +190,16 @@ class CaSRunner:
 
         if self.feature_type == "TA":
             print("Loading LM predictions (title and abstract) ...")
-            LM_pred_path = f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
+            LM_pred_path = (
+                f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
+            )
             print(f"LM_pred_path: {LM_pred_path}")
             logits = load_TA_E_logits(LM_pred_path)
         elif self.feature_type == "E":
             print("Loading LM predictions (explanations) ...")
-            LM_pred_path = f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
+            LM_pred_path = (
+                f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
+            )
             print(f"LM_pred_path: {LM_pred_path}")
             logits = load_TA_E_logits(LM_pred_path)
         elif self.feature_type == "P":
@@ -173,8 +207,12 @@ class CaSRunner:
             logits = load_P_logits()
         elif self.feature_type == None:
             print("Loading an ensemble of LM predictions ...")
-            LM_TA_pred_path = f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
-            LM_E_pred_path = f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
+            LM_TA_pred_path = (
+                f"prt_lm/{self.dataset_name}/{self.lm_model_name}-seed{self.seed}.pred"
+            )
+            LM_E_pred_path = (
+                f"prt_lm/{self.dataset_name}2/{self.lm_model_name}-seed{self.seed}.pred"
+            )
             logits = torch.stack(
                 [
                     load_TA_E_logits(LM_TA_pred_path),

@@ -1,5 +1,4 @@
 import time
-import optuna
 import pandas as pd
 
 from core.config import cfg, update_cfg
@@ -14,7 +13,7 @@ def run(cfg):
         cfg.seed = seed
         for feature_type in cfg.cas.feature_types:
             runner = CaSRunner(cfg, feature_type)
-            tmp_result_df = runner.run(dict())
+            tmp_result_df = runner.run()
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
