@@ -12,11 +12,14 @@ _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def process_adj(data: BaseData) -> Tuple[SparseTensor, torch.Tensor]:
     N = data.num_nodes
-    data.edge_index = to_undirected(data.edge_index, data.num_nodes)
+    
+    if isinstance(data.edge_index, SparseTensor):
+        adj = data.edge_index
+    else:
+        data.edge_index = to_undirected(data.edge_index, data.num_nodes)
+        row, col = data.edge_index
+        adj = SparseTensor(row=row, col=col, sparse_sizes=(N, N))
 
-    row, col = data.edge_index
-
-    adj = SparseTensor(row=row, col=col, sparse_sizes=(N, N))
     deg = adj.sum(dim=1).to(torch.float)
     deg_inv_sqrt = deg.pow(-0.5)
     deg_inv_sqrt[deg_inv_sqrt == float("inf")] = 0
