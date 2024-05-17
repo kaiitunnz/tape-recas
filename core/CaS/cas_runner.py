@@ -1,6 +1,7 @@
-from typing import Any, Callable, Dict, Optional, Tuple
+import json
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-import optuna
 import numpy as np
 import pandas as pd
 import torch
@@ -14,10 +15,16 @@ from core.data_utils.load import load_data, load_gpt_preds
 from core.CaS.cas_utils import gen_normalized_adjs, process_adj
 
 _CaSFnType = Callable[..., Tuple[torch.Tensor, torch.Tensor]]
+_CAS_PARAMS_FPATH = Path(__file__).parent.resolve() / "cas_params.json"
 
 
 class CaSRunner:
-    def __init__(self, cfg: CN, feature_type: Optional[str]):
+    def __init__(
+        self,
+        cfg: CN,
+        feature_type: Optional[str],
+        params_fpath: Union[str, Path] = _CAS_PARAMS_FPATH,
+    ):
         self.seed = cfg.seed
         self.device = cfg.device
         self.dataset_name = cfg.dataset
@@ -25,6 +32,7 @@ class CaSRunner:
         self.gnn_model_name = cfg.gnn.model.name  # Name of the predictor model
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
+        self.params_fpath = Path(params_fpath)
 
         data, num_classes = load_data(
             self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed
@@ -114,52 +122,64 @@ class CaSRunner:
         if (preds.sum(dim=-1) - 1).abs().max() > 1e-1:
             raise ValueError("Input predictions do not sum to 1.")
 
+    def _load_default_params(self) -> Dict[str, Any]:
+        with open(self.params_fpath, "r") as f:
+            all_params: Dict[str, Any] = json.load(f)
+        feature_type = self.feature_type or "Ensemble"
+        gnn_model_name = "None" if self.use_lm_pred else self.gnn_model_name
+        return all_params[self.dataset_name][self.lm_model_name][gnn_model_name][
+            feature_type
+        ]
+
     def _get_params(
         self,
         normalized_adjs: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
         params_dict: Optional[Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Any]:
-        params_dict = {} if params_dict is None else params_dict.copy()
-        cas_fn = params_dict.pop("cas_fn", "double_correlation_fixed")
+        new_params_dict = (
+            self._load_default_params() if params_dict is None else params_dict.copy()
+        )
+        saved_params_dict = new_params_dict.copy()  # TODO: remove this
+
+        cas_fn = new_params_dict.pop("cas_fn")
+
         if cas_fn == "double_correlation_autoscale":
-            params_dict_ = {
-                "train_only": True,
-                "alpha1": 1.0,
-                "alpha2": 0.8,
-                "A1": normalized_adjs[0],
-                "A2": normalized_adjs[1],
-                "num_propagations1": 50,
-                "num_propagations2": 50,
-            }
-            params_dict["A1"] = normalized_adjs[params_dict["A1"]]
-            params_dict["A2"] = normalized_adjs[params_dict["A2"]]
+            new_params_dict.update(
+                {
+                    "train_only": True,
+                    "A1": normalized_adjs[new_params_dict["A1"]],
+                    "A2": normalized_adjs[new_params_dict["A2"]],
+                }
+            )
         elif cas_fn == "double_correlation_fixed":
-            params_dict_ = {
-                "train_only": True,
-                "alpha1": 1.0,
-                "alpha2": 0.8,
-                "scale": 10.0,
-                "A1": normalized_adjs[0],
-                "A2": normalized_adjs[1],
-                "num_propagations1": 50,
-                "num_propagations2": 50,
-            }
-            params_dict["A1"] = normalized_adjs[params_dict["A1"]]
-            params_dict["A2"] = normalized_adjs[params_dict["A2"]]
+            new_params_dict.update(
+                {
+                    "train_only": True,
+                    "A1": normalized_adjs[new_params_dict["A1"]],
+                    "A2": normalized_adjs[new_params_dict["A2"]],
+                }
+            )
         elif cas_fn == "only_outcome_correlation":
-            params_dict_ = {
-                'labels': ['train'],
-                "alpha": 0.8,
-                "A": normalized_adjs[0],
-                "num_propagations": 50,
-            }
-            params_dict["A"] = normalized_adjs[params_dict["A"]]
+            new_params_dict.update(
+                {
+                    "labels": ["train"],
+                    "A": normalized_adjs[new_params_dict["A"]],
+                }
+            )
         else:
             raise ValueError(f"Unknown CaS function: {cas_fn}")
 
-        params_dict_.update(params_dict)
+        # Debug
+        debug_params = new_params_dict.copy()
+        if "A1" in debug_params:
+            debug_params["A1"] = saved_params_dict["A1"]
+        if "A2" in debug_params:
+            debug_params["A2"] = saved_params_dict["A2"]
+        if "A" in debug_params:
+            debug_params["A"] = saved_params_dict["A"]
+        print("params_dict:", debug_params)
 
-        return params_dict_, getattr(cas_utils, cas_fn)
+        return new_params_dict, getattr(cas_utils, cas_fn)
 
     def _topk_preds_to_logits(self, topk_preds: torch.Tensor) -> torch.Tensor:
         topk = topk_preds.size(-1)

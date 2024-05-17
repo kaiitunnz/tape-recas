@@ -26,8 +26,12 @@ def suggest_params(trial: Trial) -> Dict[str, Any]:
             "alpha2": trial.suggest_float("alpha2", 0.1, 1.0),
             "A1": trial.suggest_int("A1", 0, 2),
             "A2": trial.suggest_int("A2", 0, 2),
-            "num_propagations1": trial.suggest_int("num_propagations1", 10, 100, step=10),
-            "num_propagations2": trial.suggest_int("num_propagations2", 10, 100, step=10),
+            "num_propagations1": trial.suggest_int(
+                "num_propagations1", 10, 100, step=10
+            ),
+            "num_propagations2": trial.suggest_int(
+                "num_propagations2", 10, 100, step=10
+            ),
         }
     elif cas_fn == "double_correlation_fixed":
         params_dict = {
@@ -36,8 +40,12 @@ def suggest_params(trial: Trial) -> Dict[str, Any]:
             "scale": trial.suggest_float("scale", 5.0, 20.0),
             "A1": trial.suggest_int("A1", 0, 2),
             "A2": trial.suggest_int("A2", 0, 2),
-            "num_propagations1": trial.suggest_int("num_propagations1", 10, 100, step=10),
-            "num_propagations2": trial.suggest_int("num_propagations2", 10, 100, step=10),
+            "num_propagations1": trial.suggest_int(
+                "num_propagations1", 10, 100, step=10
+            ),
+            "num_propagations2": trial.suggest_int(
+                "num_propagations2", 10, 100, step=10
+            ),
         }
     elif cas_fn == "only_outcome_correlation":
         params_dict = {
@@ -53,6 +61,7 @@ def suggest_params(trial: Trial) -> Dict[str, Any]:
 
 def objective(trial: Trial, feature_type: Optional[str], cfg) -> float:
     params_dict = suggest_params(trial)
+    old_seed = cfg.seed
     seeds = [cfg.seed] if cfg.seed is not None else range(cfg.runs)
     all_result_df = pd.DataFrame()
     for seed in seeds:
@@ -63,7 +72,9 @@ def objective(trial: Trial, feature_type: Optional[str], cfg) -> float:
 
     result_df = all_result_df.groupby("method")
     avg_df = result_df.mean()
-    return avg_df.loc[runner._get_method_name(False)]["valid_acc"]
+    score = avg_df.loc[runner._get_method_name(False)]["valid_acc"]
+    cfg.seed = old_seed  # Restore the seed.
+    return score
 
 
 def run(cfg, best_params_dict: Dict[str, Dict[str, Any]]):
@@ -75,7 +86,9 @@ def run(cfg, best_params_dict: Dict[str, Dict[str, Any]]):
         for feature_type in cfg.cas.feature_types:
             runner = CaSRunner(cfg, feature_type)
             best_params = best_params_dict[feature_type]
-            print(f"Best parameters for '{runner._get_method_name(False)}': {best_params}")
+            print(
+                f"Best parameters for '{runner._get_method_name(False)}': {best_params}"
+            )
             tmp_result_df = runner.run(best_params)
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
@@ -100,7 +113,9 @@ if __name__ == "__main__":
         print(f"Feature type: {feature_type}", file=sys.stderr)
         study = optuna.create_study(direction="maximize")
         study.optimize(
-            lambda trial: objective(trial, feature_type, cfg), n_trials=100, n_jobs=cfg.cas.optuna.n_jobs
+            lambda trial: objective(trial, feature_type, cfg),
+            n_trials=100,
+            n_jobs=cfg.cas.optuna.n_jobs,
         )
         best_params_dict[feature_type] = study.best_params
 
