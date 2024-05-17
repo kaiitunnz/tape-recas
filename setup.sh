@@ -12,3 +12,6 @@ pip install --upgrade accelerate
 
 # For typing
 pip install pandas-stubs
+
+# For downloading the datasets
+pip install gdown
