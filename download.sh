@@ -29,9 +29,13 @@ cd gpt_responses
 
 # 1. ogbn-arxiv
 gdown 1A6mZSFzDIhJU795497R6mAAM2Y9qutI5
+unzip ogbn-arxiv.zip
+rm ogbn-arxiv.zip
 
 # 2. ogbn-products
 gdown 1C769tlhd8pT0s7I3vXIEUI-PK7A4BB1p
+unzip ogbn-products.zip
+rm ogbn-products.zip
 
 # 3. arxiv_2023
 wget -O arxiv_2023.zip https://www.dropbox.com/scl/fi/cpy9m3mu6jasxr18scsoc/arxiv_2023.zip?rlkey=4wwgw1pgtrl8fo308v7zpyk59&dl=0
@@ -40,9 +44,13 @@ rm arxiv_2023.zip
 
 # 4. cora
 gdown 1tSepgcztiNNth4kkSR-jyGkNnN7QDYax
+unzip Cora.zip
+rm Cora.zip
 
 # 5. PubMed
 gdown 166waPAjUwu7EWEvMJ0heflfp0-4EvrZS
+unzip PubMed.zip
+rm PubMed.zip
 
 cd -
 
