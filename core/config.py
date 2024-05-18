@@ -15,8 +15,8 @@ def set_cfg(cfg):
     # Whether fix the running seed to remove randomness
     cfg.seed = None
     # Number of runs with random init
-    # cfg.runs = 4
-    cfg.runs = 1
+    cfg.runs = 4
+    # cfg.runs = 1
     cfg.gnn = CN()
     cfg.lm = CN()
 
@@ -55,8 +55,8 @@ def set_cfg(cfg):
     # ------------------------------------------------------------------------ #
     cfg.lm.model = CN()
     # LM model name
-    # cfg.lm.model.name = 'microsoft/deberta-base'
-    cfg.lm.model.name = 'FacebookAI/roberta-base'
+    cfg.lm.model.name = 'microsoft/deberta-base'
+    # cfg.lm.model.name = 'FacebookAI/roberta-base'
     cfg.lm.model.feat_shrink = ""
 
     # ------------------------------------------------------------------------ #
@@ -93,6 +93,12 @@ def set_cfg(cfg):
     cfg.cas = CN()
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
+
+    # ------------------------------------------------------------------------ #
+    # C&S Optuna options
+    # ------------------------------------------------------------------------ #
+    cfg.cas.optuna = CN()
+    cfg.cas.optuna.n_jobs = 1
 
     return cfg
 
