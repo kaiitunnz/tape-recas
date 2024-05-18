@@ -63,21 +63,32 @@ class CaSRunner:
         result_df = self._add_eval_results(
             result_df, self._get_method_name(True), eval_results
         )
-        eval_results = self.evaluate_cas_preds(model_preds, cas_params, cas_fn)
+        eval_results = self.evaluate_c_preds(model_preds, cas_params, cas_fn)
         result_df = self._add_eval_results(
-            result_df, self._get_method_name(False), eval_results
+            result_df, self._get_method_name(False, 'c'), eval_results
+        )
+        eval_results = self.evaluate_s_preds(model_preds, cas_params, cas_fn)
+        result_df = self._add_eval_results(
+            result_df, self._get_method_name(False, 's'), eval_results
         )
 
         return result_df
 
-    def _get_method_name(self, is_original: bool) -> str:
+    def _get_method_name(self, is_original: bool, which_cas: str = '') -> str:
         feature_type = "Ensemble" if self.feature_type is None else self.feature_type
         method_name = (
             f"{self.lm_model_name}+{feature_type}"
             if self.use_lm_pred
             else f"{self.lm_model_name}+{self.gnn_model_name}+{feature_type}"
         )
-        return method_name if is_original else method_name + "+C&S"
+        if is_original:       
+            return method_name
+        elif which_cas == 'c':
+            return method_name + "+C"
+        elif which_cas == 's':
+            return method_name + "+S"
+        else:
+            raise ValueError("Invalid which_cas")
 
     def _add_eval_results(
         self, result_df: pd.DataFrame, method_name: str, eval_results: Dict[str, float]
@@ -109,7 +120,16 @@ class CaSRunner:
         self._validate_preds(preds)
         return {split: self._eval(preds, split) for split in ["train", "valid", "test"]}
 
-    def evaluate_cas_preds(
+    def evaluate_c_preds(
+        self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
+    ) -> Dict[str, float]:
+        self._validate_preds(preds)
+        res_result, _ = cas_fn(self.data, preds, self.split_idx, **cas_params)
+        return {
+            split: self._eval(res_result, split) for split in ["train", "valid", "test"]
+        }
+    
+    def evaluate_s_preds(
         self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
     ) -> Dict[str, float]:
         self._validate_preds(preds)
@@ -117,6 +137,15 @@ class CaSRunner:
         return {
             split: self._eval(result, split) for split in ["train", "valid", "test"]
         }
+    
+    # def evaluate_cas_preds(
+    #     self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
+    # ) -> Dict[str, float]:
+    #     self._validate_preds(preds)
+    #     _, result = cas_fn(self.data, preds, self.split_idx, **cas_params)
+    #     return {
+    #         split: self._eval(result, split) for split in ["train", "valid", "test"]
+    #     }
 
     def _validate_preds(self, preds: torch.Tensor):
         if (preds.sum(dim=-1) - 1).abs().max() > 1e-1:
