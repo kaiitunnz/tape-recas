@@ -53,14 +53,8 @@ function download_pred_emb() {
     cd $data_dir
     # gdown $2
     # gdown $3
-    gdown.download(
-    f"https://drive.google.com/uc?export=download&confirm=pbef&id={$2}",
-    output
-    )
-    gdown.download(
-    f"https://drive.google.com/uc?export=download&confirm=pbef&id={$3}",
-    output
-    )
+    gdown.download(f"https://drive.google.com/uc?export=download&confirm=pbef&id={$2}", output)
+    gdown.download(f"https://drive.google.com/uc?export=download&confirm=pbef&id={$3}", output)
     cd -
 }
 
