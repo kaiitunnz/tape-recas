@@ -37,13 +37,18 @@ class Evaluator:
         y_pred = y_pred.detach().cpu().numpy()
         y_true = y_true.detach().cpu().numpy()
         acc_list = []
+        correct_arr = np.full((y_true.shape[0], y_true.shape[1]), False)
 
         for i in range(y_true.shape[1]):
             is_labeled = y_true[:, i] == y_true[:, i]
             correct = y_true[is_labeled, i] == y_pred[is_labeled, i]
+            correct_arr[is_labeled, i] = correct
             acc_list.append(float(np.sum(correct))/len(correct))
 
-        return {'acc': sum(acc_list)/len(acc_list)}
+        return {
+            'acc': sum(acc_list)/len(acc_list),
+            'correct': correct_arr,
+        }
 
 
 """
