@@ -63,15 +63,15 @@ cd -
 # arxiv_2023
 gdown https://drive.google.com/drive/folders/1QV0Ihwtfcgj6bjHktKzvDcDqoMuyZa7M --folder
 
-cd prt_lm
-# cora
-gdown https://drive.google.com/drive/folders/1mR_qtWhzH-LX34n4SaFnDFefcKovaVxy --folder
-gdown https://drive.google.com/drive/folders/1LrMVAaD5Lu2fvJ_SghfgsyiVeyhjDXv6 --folder
-# ogbn-arxiv
-gdown https://drive.google.com/drive/folders/1YebF5eo_Hm4A7CPrDDbq900UCE95iWOv --folder
-gdown https://drive.google.com/drive/folders/1cgdkU9pCNpZ3D7MA3lOx3x5s3OFDU6t5 --folder
-# pubmed
-gdown https://drive.google.com/drive/folders/1wys171LrFJA9Hx__1Fj_2K3SWwQfTsGg --folder
-gdown https://drive.google.com/drive/folders/1Kufal4btFKT7sYNVxoxIyhDiY3YBpsGn --folder
+# cd prt_lm
+# # cora
+# gdown https://drive.google.com/drive/folders/1mR_qtWhzH-LX34n4SaFnDFefcKovaVxy --folder
+# gdown https://drive.google.com/drive/folders/1LrMVAaD5Lu2fvJ_SghfgsyiVeyhjDXv6 --folder
+# # ogbn-arxiv
+# gdown https://drive.google.com/drive/folders/1YebF5eo_Hm4A7CPrDDbq900UCE95iWOv --folder
+# gdown https://drive.google.com/drive/folders/1cgdkU9pCNpZ3D7MA3lOx3x5s3OFDU6t5 --folder
+# # pubmed
+# gdown https://drive.google.com/drive/folders/1wys171LrFJA9Hx__1Fj_2K3SWwQfTsGg --folder
+# gdown https://drive.google.com/drive/folders/1Kufal4btFKT7sYNVxoxIyhDiY3YBpsGn --folder
 
-cd -
+# cd -
