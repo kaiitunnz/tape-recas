@@ -11,8 +11,6 @@ def run(cfg):
     all_result_df = pd.DataFrame()
     start = time.time()
     for seed in seeds:
-        # save df for further analysis
-        os.makedirs(f'sep_cas_rets/{seed}', exist_ok=True)
 
         cfg.seed = seed
         for feature_type in cfg.cas.feature_types:
@@ -20,14 +18,24 @@ def run(cfg):
             tmp_result_df, tmp_raw_change_train_df, tmp_raw_change_valid_df, tmp_raw_change_test_df = runner.run()
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
 
-            os.makedirs(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}', exist_ok=True)
-            tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_train.csv', index=False)
-            tmp_raw_change_valid_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_valid.csv', index=False)
-            tmp_raw_change_test_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_test.csv', index=False)
+            # save df for further analysis
+            if cfg.cas.use_lm_pred:
+                os.makedirs(f'sep_cas_rets/{cfg.dataset}/LM', exist_ok=True)
+                tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_train.csv', index=False)
+                tmp_raw_change_valid_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_valid.csv', index=False)
+                tmp_raw_change_test_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_test.csv', index=False)
+            else:
+                os.makedirs(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}', exist_ok=True)
+                tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_train.csv', index=False)
+                tmp_raw_change_valid_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_valid.csv', index=False)
+                tmp_raw_change_test_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_test.csv', index=False)
     end = time.time()
 
     # save df for further analysis
-    all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{cfg.gnn.model.name}.csv', index=False)
+    if cfg.cas.use_lm_pred:
+        all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM.csv', index=False)
+    else:
+        all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{cfg.gnn.model.name}.csv', index=False)
 
     result_df = all_result_df.drop('cas_fn', axis=1).groupby("method")
     avg_df = result_df.mean()
