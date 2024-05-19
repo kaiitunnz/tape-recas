@@ -29,7 +29,7 @@ def run(cfg):
     # save df for further analysis
     all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{cfg.gnn.model.name}.csv', index=False)
 
-    result_df = all_result_df.groupby("method")
+    result_df = all_result_df.drop('cas_fn', axis=1).groupby("method")
     avg_df = result_df.mean()
     std_df = result_df.std()
     for (method, avg_row), (_, std_row) in zip(avg_df.iterrows(), std_df.iterrows()):
