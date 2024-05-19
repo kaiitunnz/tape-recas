@@ -17,6 +17,9 @@ def run(cfg):
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
+    # save df for further analysis
+    all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}_{cfg.cas.use_lm_pred}.csv', index=False)
+
     result_df = all_result_df.groupby("method")
     avg_df = result_df.mean()
     std_df = result_df.std()
