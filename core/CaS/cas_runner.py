@@ -61,7 +61,7 @@ class CaSRunner:
         result_df = pd.DataFrame()
         _, eval_results, eval_results_raw_none = self.evaluate_original_preds(model_preds)
         result_df = self._add_eval_results(
-            result_df, self._get_method_name(True), eval_results
+            result_df, self._get_method_name(True), eval_results, cas_fn_str
         )
         _, eval_results, eval_results_raw_c = self.evaluate_c_preds(model_preds, cas_params, cas_fn)
         result_df = self._add_eval_results(
