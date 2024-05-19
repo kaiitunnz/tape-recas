@@ -1,5 +1,6 @@
 import time
 import pandas as pd
+import os
 
 from core.config import cfg, update_cfg
 from core.CaS.cas_runner import CaSRunner
@@ -18,6 +19,7 @@ def run(cfg):
     end = time.time()
 
     # save df for further analysis
+    os.makedirs('sep_cas_rets', exist_ok=True)
     all_result_df.to_csv(f'sep_cas_rets/{cfg.dataset}_{cfg.cas.use_lm_pred}.csv', index=False)
 
     result_df = all_result_df.groupby("method")

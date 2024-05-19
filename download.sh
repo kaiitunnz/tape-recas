@@ -8,7 +8,7 @@ rm titleabs.tsv.gz
 
 # 2. arxiv_2023
 gdown 1-s1Hf_2koa1DYp_TQvYetAaivK9YDerv
-unzip arxiv_2023_orig.zip
+yes | unzip arxiv_2023_orig.zip
 rm arxiv_2023_orig.zip
 
 # 3. cora
