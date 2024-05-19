@@ -21,9 +21,9 @@ def run(cfg):
             # save df for further analysis
             if cfg.cas.use_lm_pred:
                 os.makedirs(f'sep_cas_rets/{cfg.dataset}/LM', exist_ok=True)
-                tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_train.csv', index=False)
-                tmp_raw_change_valid_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_valid.csv', index=False)
-                tmp_raw_change_test_df.to_csv(f'sep_cas_rets/{cfg.dataset}/LM/{feature_type}_raw_change_test.csv', index=False)
+                tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/LM/{feature_type}_raw_change_train.csv', index=False)
+                tmp_raw_change_valid_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/LM/{feature_type}_raw_change_valid.csv', index=False)
+                tmp_raw_change_test_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/LM/{feature_type}_raw_change_test.csv', index=False)
             else:
                 os.makedirs(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}', exist_ok=True)
                 tmp_raw_change_train_df.to_csv(f'sep_cas_rets/{cfg.dataset}/{seed}/{cfg.gnn.model.name}/{feature_type}_raw_change_train.csv', index=False)
