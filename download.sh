@@ -60,5 +60,5 @@ rm PubMed.zip
 cd -
 
 # Download LM predictions and features
-gdown https://drive.google.com/drive/folders/1nF8NDGObIqU0kCkzVaisWooGEQlcNSIN  --folder
+gdown https://drive.google.com/drive/folders/1nF8NDGObIqU0kCkzVaisWooGEQlcNSIN --folder
 gdown https://drive.google.com/drive/folders/1QV0Ihwtfcgj6bjHktKzvDcDqoMuyZa7M --folder
