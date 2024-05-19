@@ -60,8 +60,12 @@ rm PubMed.zip
 cd -
 
 # Download LM predictions and features
+gdown 1vywgfqge2_O6kf3emtG7TiQD0oWdiz9v
+unzip prt_lm.zip
+rm prt_lm.zip
+
 # arxiv_2023
-gdown https://drive.google.com/drive/folders/1QV0Ihwtfcgj6bjHktKzvDcDqoMuyZa7M --folder
+# gdown https://drive.google.com/drive/folders/1QV0Ihwtfcgj6bjHktKzvDcDqoMuyZa7M --folder
 
 # cd prt_lm
 # # cora
