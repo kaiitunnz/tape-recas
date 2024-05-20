@@ -2,10 +2,11 @@ import time
 
 import pandas as pd
 import torch
+import os
 
 from core.config import cfg, update_cfg
 from core.GNNs.ensemble_trainer import EnsembleTrainer
-from core.GNNs.gnn_utils import get_pred_fname
+from core.GNNs.gnn_utils import get_ckpt_dir, get_pred_fname
 
 
 def run(cfg):
@@ -18,6 +19,7 @@ def run(cfg):
         pred, acc = ensembler.train()
         all_acc.append(acc)
         for feature_type, logits in pred.items():
+            os.makedirs(get_ckpt_dir(ensembler.dataset_name + '/microsoft'), exist_ok = True) 
             torch.save(
                 logits.cpu(),
                 get_pred_fname(
