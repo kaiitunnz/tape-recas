@@ -5,6 +5,10 @@ gpt_responses
 logs
 results
 
+# TODO: remove this
+prt_lm_
+sep_cas_rets
+
 # C extensions
 *.so
 
