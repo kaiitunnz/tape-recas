@@ -19,7 +19,9 @@ def run(cfg):
         pred, acc = ensembler.train()
         all_acc.append(acc)
         for feature_type, logits in pred.items():
-            os.makedirs(get_ckpt_dir(ensembler.dataset_name + '/microsoft'), exist_ok = True) 
+            os.makedirs(
+                get_ckpt_dir(ensembler.dataset_name + "/microsoft"), exist_ok=True
+            )
             torch.save(
                 logits.cpu(),
                 get_pred_fname(

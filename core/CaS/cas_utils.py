@@ -12,7 +12,7 @@ _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def process_adj(data: BaseData) -> Tuple[SparseTensor, torch.Tensor]:
     N = data.num_nodes
-    
+
     if isinstance(data.edge_index, SparseTensor):
         adj = data.edge_index
     else:

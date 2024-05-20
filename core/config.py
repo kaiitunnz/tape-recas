@@ -1,6 +1,6 @@
 import os
 import argparse
-from yacs.config import CfgNode as CN       # type: ignore
+from yacs.config import CfgNode as CN  # type: ignore
 
 
 def set_cfg(cfg):
@@ -9,7 +9,7 @@ def set_cfg(cfg):
     # Basic options
     # ------------------------------------------------------------------------ #
     # Dataset name
-    cfg.dataset = 'cora'
+    cfg.dataset = "cora"
     # Cuda device number, used for machine with multiple gpus
     cfg.device = 0
     # Whether fix the running seed to remove randomness
@@ -25,7 +25,7 @@ def set_cfg(cfg):
     # ------------------------------------------------------------------------ #
     cfg.gnn.model = CN()
     # GNN model name
-    cfg.gnn.model.name = 'GCN'
+    cfg.gnn.model.name = "GCN"
     # Number of gnn layers
     cfg.gnn.model.num_layers = 4
     # Hidden size of the model
@@ -40,7 +40,7 @@ def set_cfg(cfg):
     # Maximal number of epochs
     cfg.gnn.train.epochs = 200
     # Node feature type, options: ogb, TA, P, E
-    cfg.gnn.train.feature_type = 'TA_P_E'
+    cfg.gnn.train.feature_type = "TA_P_E"
     # Number of epochs with no improvement after which training will be stopped
     cfg.gnn.train.early_stop = 50
     # Base learning rate
@@ -55,7 +55,7 @@ def set_cfg(cfg):
     # ------------------------------------------------------------------------ #
     cfg.lm.model = CN()
     # LM model name
-    cfg.lm.model.name = 'microsoft/deberta-base'
+    cfg.lm.model.name = "microsoft/deberta-base"
     # cfg.lm.model.name = 'FacebookAI/roberta-base'
     cfg.lm.model.feat_shrink = ""
 
@@ -110,11 +110,16 @@ def set_cfg(cfg):
 
 def update_cfg(cfg, args_str=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default="",
-                        metavar="FILE", help="Path to config file")
+    parser.add_argument(
+        "--config", default="", metavar="FILE", help="Path to config file"
+    )
     # opts arg needs to match set_cfg
-    parser.add_argument("opts", default=[], nargs=argparse.REMAINDER,
-                        help="Modify config options using the command-line")
+    parser.add_argument(
+        "opts",
+        default=[],
+        nargs=argparse.REMAINDER,
+        help="Modify config options using the command-line",
+    )
 
     if isinstance(args_str, str):
         # parse from a string
