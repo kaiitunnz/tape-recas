@@ -49,6 +49,7 @@ def set_cfg(cfg):
     cfg.gnn.train.wd = 0.0
     # Dropout rate
     cfg.gnn.train.dropout = 0.0
+    cfg.gnn.train.use_emb = None
 
     # ------------------------------------------------------------------------ #
     # LM Model options
@@ -99,6 +100,15 @@ def set_cfg(cfg):
     # ------------------------------------------------------------------------ #
     cfg.cas.optuna = CN()
     cfg.cas.optuna.n_jobs = 1
+
+    # ------------------------------------------------------------------------ #
+    # Node2Vec options
+    # ------------------------------------------------------------------------ #
+    cfg.node2vec = CN()
+    cfg.node2vec.epochs = 100
+    cfg.node2vec.batch_size = 128
+    cfg.node2vec.num_workers = 4
+    cfg.node2vec.max_iter = 300
 
     return cfg
 

@@ -31,35 +31,37 @@
         }
       },
       "MLP": {
-        "TA": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.2932362908748125,
-          "A": 0,
-          "num_propagations": 90
-        },
-        "P": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.9496267132260341,
-          "alpha2": 0.24660328986533145,
-          "A1": 0,
-          "A2": 2,
-          "num_propagations1": 60,
-          "num_propagations2": 50
-        },
-        "E": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.48535981599128114,
-          "A": 1,
-          "num_propagations": 40
-        },
-        "Ensemble": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.7903239393312705,
-          "alpha2": 0.24145081876904817,
-          "A1": 1,
-          "A2": 2,
-          "num_propagations1": 30,
-          "num_propagations2": 10
+        "None": {
+          "TA": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.2932362908748125,
+            "A": 0,
+            "num_propagations": 90
+          },
+          "P": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9496267132260341,
+            "alpha2": 0.24660328986533145,
+            "A1": 0,
+            "A2": 2,
+            "num_propagations1": 60,
+            "num_propagations2": 50
+          },
+          "E": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.48535981599128114,
+            "A": 1,
+            "num_propagations": 40
+          },
+          "Ensemble": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.7903239393312705,
+            "alpha2": 0.24145081876904817,
+            "A1": 1,
+            "A2": 2,
+            "num_propagations1": 30,
+            "num_propagations2": 10
+          }
         }
       },
       "RevGAT": {
@@ -152,35 +154,37 @@
         }
       },
       "MLP": {
-        "TA": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.9961917624425123,
-          "alpha2": 0.5574100522517761,
-          "A1": 1,
-          "A2": 2,
-          "num_propagations1": 90,
-          "num_propagations2": 10
-        },
-        "P": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.5784546711803843,
-          "A": 1,
-          "num_propagations": 90
-        },
-        "E": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.3869533846146773,
-          "alpha2": 0.12930515080046406,
-          "A1": 0,
-          "A2": 2,
-          "num_propagations1": 100,
-          "num_propagations2": 40
-        },
-        "Ensemble": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.20305970175605254,
-          "A": 1,
-          "num_propagations": 50
+        "None": {
+          "TA": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9961917624425123,
+            "alpha2": 0.5574100522517761,
+            "A1": 1,
+            "A2": 2,
+            "num_propagations1": 90,
+            "num_propagations2": 10
+          },
+          "P": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.5784546711803843,
+            "A": 1,
+            "num_propagations": 90
+          },
+          "E": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.3869533846146773,
+            "alpha2": 0.12930515080046406,
+            "A1": 0,
+            "A2": 2,
+            "num_propagations1": 100,
+            "num_propagations2": 40
+          },
+          "Ensemble": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.20305970175605254,
+            "A": 1,
+            "num_propagations": 50
+          }
         }
       },
       "RevGAT": {
@@ -295,38 +299,40 @@
         }
       },
       "MLP": {
-        "TA": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.35597172039214375,
-          "alpha2": 0.7890706474453603,
-          "A1": 0,
-          "A2": 0,
-          "num_propagations1": 70,
-          "num_propagations2": 90
-        },
-        "P": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.9482581939754928,
-          "alpha2": 0.6907293612766396,
-          "A1": 2,
-          "A2": 0,
-          "num_propagations1": 50,
-          "num_propagations2": 10
-        },
-        "E": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.8523836928871914,
-          "alpha2": 0.7604721591994252,
-          "A1": 0,
-          "A2": 0,
-          "num_propagations1": 70,
-          "num_propagations2": 50
-        },
-        "Ensemble": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.7133085745968918,
-          "A": 0,
-          "num_propagations": 70
+        "None": {
+          "TA": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.35597172039214375,
+            "alpha2": 0.7890706474453603,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 70,
+            "num_propagations2": 90
+          },
+          "P": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9482581939754928,
+            "alpha2": 0.6907293612766396,
+            "A1": 2,
+            "A2": 0,
+            "num_propagations1": 50,
+            "num_propagations2": 10
+          },
+          "E": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.8523836928871914,
+            "alpha2": 0.7604721591994252,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 70,
+            "num_propagations2": 50
+          },
+          "Ensemble": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.7133085745968918,
+            "A": 0,
+            "num_propagations": 70
+          }
         }
       },
       "RevGAT": {
@@ -462,29 +468,31 @@
         }
       },
       "MLP": {
-        "TA": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.4567700552562358,
-          "A": 1,
-          "num_propagations": 70
-        },
-        "P": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.7608976251932378,
-          "A": 1,
-          "num_propagations": 90
-        },
-        "E": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.6071775909502942,
-          "A": 1,
-          "num_propagations": 10
-        },
-        "Ensemble": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.8105811857715882,
-          "A": 0,
-          "num_propagations": 60
+        "None": {
+          "TA": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.4567700552562358,
+            "A": 1,
+            "num_propagations": 70
+          },
+          "P": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.7608976251932378,
+            "A": 1,
+            "num_propagations": 90
+          },
+          "E": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.6071775909502942,
+            "A": 1,
+            "num_propagations": 10
+          },
+          "Ensemble": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.8105811857715882,
+            "A": 0,
+            "num_propagations": 60
+          }
         }
       },
       "RevGAT": {
@@ -623,32 +631,34 @@
         }
       },
       "MLP": {
-        "TA": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.22808592222599305,
-          "A": 0,
-          "num_propagations": 20
-        },
-        "P": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.31114791524111324,
-          "A": 1,
-          "num_propagations": 40
-        },
-        "E": {
-          "cas_fn": "only_outcome_correlation",
-          "alpha": 0.5716410697806001,
-          "A": 0,
-          "num_propagations": 40
-        },
-        "Ensemble": {
-          "cas_fn": "double_correlation_autoscale",
-          "alpha1": 0.4976127101319445,
-          "alpha2": 0.29646717762509645,
-          "A1": 0,
-          "A2": 1,
-          "num_propagations1": 100,
-          "num_propagations2": 70
+        "None": {
+          "TA": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.22808592222599305,
+            "A": 0,
+            "num_propagations": 20
+          },
+          "P": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.31114791524111324,
+            "A": 1,
+            "num_propagations": 40
+          },
+          "E": {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.5716410697806001,
+            "A": 0,
+            "num_propagations": 40
+          },
+          "Ensemble": {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.4976127101319445,
+            "alpha2": 0.29646717762509645,
+            "A1": 0,
+            "A2": 1,
+            "num_propagations1": 100,
+            "num_propagations2": 70
+          }
         }
       },
       "RevGAT": {

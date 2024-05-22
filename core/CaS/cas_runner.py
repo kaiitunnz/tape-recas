@@ -33,6 +33,7 @@ class CaSRunner:
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
         self.params_fpath = Path(params_fpath)
+        self.use_emb = cfg.gnn.train.use_emb if self.gnn_model_name == "MLP" else None
 
         data, num_classes = load_data(
             self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed
@@ -47,7 +48,9 @@ class CaSRunner:
 
         self.evaluator = Evaluator(name=self.dataset_name)
 
-    def run(self, params_dict: Optional[Dict[str, Any]] = None) -> Tuple[pd.DataFrame, ...]:
+    def run(
+        self, params_dict: Optional[Dict[str, Any]] = None
+    ) -> Tuple[pd.DataFrame, ...]:
         adj, D_isqrt = process_adj(self.data)
         normalized_adjs = gen_normalized_adjs(adj, D_isqrt)
 
@@ -234,9 +237,10 @@ class CaSRunner:
             all_params: Dict[str, Any] = json.load(f)
         feature_type = self.feature_type or "Ensemble"
         gnn_model_name = "None" if self.use_lm_pred else self.gnn_model_name
-        return all_params[self.dataset_name][self.lm_model_name][gnn_model_name][
-            feature_type
-        ]
+        result = all_params[self.dataset_name][self.lm_model_name][gnn_model_name]
+        if gnn_model_name == "MLP":
+            return result[str(self.use_emb)][feature_type]
+        return result[feature_type]
 
     def _get_params(
         self,
@@ -362,6 +366,7 @@ class CaSRunner:
                 self.lm_model_name,
                 self.gnn_model_name,
                 feature_type,
+                self.use_emb,
                 self.seed,
             ),
             map_location="cpu",

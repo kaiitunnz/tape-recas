@@ -5,25 +5,31 @@ import torch
 
 
 def get_gnn_trainer(model):
-    if model in ['GCN', 'RevGAT', 'SAGE']:
+    if model in ["GCN", "RevGAT", "SAGE"]:
         from core.GNNs.gnn_trainer import GNNTrainer
     else:
-        raise ValueError(f'GNN-Trainer for model {model} is not defined')
+        raise ValueError(f"GNN-Trainer for model {model} is not defined")
     return GNNTrainer
 
 
 def get_ckpt_dir(dataset_name: str) -> str:
-    return  f"output/{dataset_name}"
+    return f"output/{dataset_name}"
 
 
 def get_pred_fname(
-    dataset_name: str, lm_model_name: str, gnn_model_name: str, feature_type: str, seed: int
+    dataset_name: str,
+    lm_model_name: str,
+    gnn_model_name: str,
+    feature_type: str,
+    use_emb: str,
+    seed: int,
 ) -> str:
     return (
         f"{get_ckpt_dir(dataset_name)}/"
         f"{lm_model_name}_"
         f"{gnn_model_name}_"
         f"{feature_type}_"
+        f"{use_emb}_"
         f"seed{seed}.pred"
     )
 
@@ -43,11 +49,11 @@ class Evaluator:
             is_labeled = y_true[:, i] == y_true[:, i]
             correct = y_true[is_labeled, i] == y_pred[is_labeled, i]
             correct_arr[is_labeled, i] = correct
-            acc_list.append(float(np.sum(correct))/len(correct))
+            acc_list.append(float(np.sum(correct)) / len(correct))
 
         return {
-            'acc': sum(acc_list)/len(acc_list),
-            'correct': correct_arr,
+            "acc": sum(acc_list) / len(acc_list),
+            "correct": correct_arr,
         }
 
 
@@ -57,7 +63,7 @@ Early stop modified from DGL implementation
 
 
 class EarlyStopping:
-    def __init__(self, patience=10, path='es_checkpoint.pt'):
+    def __init__(self, patience=10, path="es_checkpoint.pt"):
         self.patience = patience
         self.counter = 0
         self.best_score = None
@@ -84,7 +90,7 @@ class EarlyStopping:
             self.best_epoch = epoch
             self.save_checkpoint(model)
             self.counter = 0
-        es_str = f'{self.counter:02d}/{self.patience:02d} | BestVal={self.best_score:.4f}@E{self.best_epoch}'
+        es_str = f"{self.counter:02d}/{self.patience:02d} | BestVal={self.best_score:.4f}@E{self.best_epoch}"
         return self.early_stop, es_str
 
     def save_checkpoint(self, model):
