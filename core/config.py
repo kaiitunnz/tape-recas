@@ -94,6 +94,7 @@ def set_cfg(cfg):
     cfg.cas = CN()
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
+    cfg.cas.train_only = False
 
     # ------------------------------------------------------------------------ #
     # C&S Optuna options

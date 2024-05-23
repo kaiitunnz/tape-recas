@@ -34,6 +34,7 @@ class CaSRunner:
         self.use_lm_pred = cfg.cas.use_lm_pred
         self.params_fpath = Path(params_fpath)
         self.use_emb = cfg.gnn.train.use_emb if self.gnn_model_name == "MLP" else None
+        self.train_only = cfg.cas.train_only
 
         data, num_classes = load_data(
             self.dataset_name, use_dgl=False, use_text=False, seed=cfg.seed
@@ -135,6 +136,8 @@ class CaSRunner:
             if self.use_lm_pred
             else f"{self.lm_model_name}+{self.gnn_model_name}+{feature_type}"
         )
+        if self.use_emb is not None:
+            method_name += f"+{self.use_emb}"
         if is_original:
             return method_name
         elif which_cas == "c":
@@ -257,7 +260,7 @@ class CaSRunner:
         if cas_fn == "double_correlation_autoscale":
             new_params_dict.update(
                 {
-                    "train_only": True,
+                    "train_only": self.train_only,
                     "A1": normalized_adjs[new_params_dict["A1"]],
                     "A2": normalized_adjs[new_params_dict["A2"]],
                 }
@@ -265,7 +268,7 @@ class CaSRunner:
         elif cas_fn == "double_correlation_fixed":
             new_params_dict.update(
                 {
-                    "train_only": True,
+                    "train_only": self.train_only,
                     "A1": normalized_adjs[new_params_dict["A1"]],
                     "A2": normalized_adjs[new_params_dict["A2"]],
                 }
@@ -273,7 +276,7 @@ class CaSRunner:
         elif cas_fn == "only_outcome_correlation":
             new_params_dict.update(
                 {
-                    "labels": ["train"],
+                    "labels": ["train"] if self.train_only else ["train", "valid"],
                     "A": normalized_adjs[new_params_dict["A"]],
                 }
             )
