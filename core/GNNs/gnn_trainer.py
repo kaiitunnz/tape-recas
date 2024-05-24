@@ -88,13 +88,10 @@ class GNNTrainer():
             self.use_emb = cfg.gnn.train.use_emb
         
         self.emb = self.load_emb(self.use_emb)
-        self.preprocessed_emb = self.load_preprocess_emb(self.use_preprocessed_emb)
 
         feature_dim = self.hidden_dim*topk if use_pred else self.features.shape[1]
         if self.emb is not None:
             feature_dim += self.emb.shape[1]
-        if self.preprocessed_emb is not None:
-            feature_dim += self.preprocessed_emb.shape[1]
         self.model = GNN(in_channels=feature_dim,
                          hidden_channels=self.hidden_dim,
                          out_channels=self.num_classes,
@@ -200,5 +197,5 @@ class GNNTrainer():
             prep_lst = []
             methods = use_emb.split('-')
             for method in methods:
-                prep_lst.append(preprocess(self.dataset_name, method))
+                prep_lst.append(preprocess(self.data, method))
             return torch.cat(prep_lst, dim=1).to(self.device)
