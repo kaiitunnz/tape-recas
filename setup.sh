@@ -16,6 +16,6 @@ pip install pandas-stubs
 # For downloading the datasets
 pip install gdown
 
-# For spectral embedding
-pip install julia
-pip install h5py
+# # For spectral embedding
+# pip install julia
+# pip install h5py

@@ -11,7 +11,7 @@ import numpy as np
 from scipy import sparse
 from torch_scatter import scatter
 
-import h5py
+# import h5py
 import os
 
 import numpy as np
@@ -83,6 +83,11 @@ def community(data, post_fix):
 
 # spectral embedding
 def spectral(data, post_fix):
+    try:
+        __import__(package)
+    except ImportError:
+        return spectral_py(data, post_fix)
+    
     from julia.api import Julia
     jl = Julia(compiled_modules=False)
     from julia import Main
@@ -97,6 +102,24 @@ def spectral(data, post_fix):
     adj = SparseTensor(row=row, col=col, sparse_sizes=(N, N))
     adj = adj.to_scipy(layout='csr')
     result = torch.tensor(Main.main(adj, 128)).float()
+    torch.save(result, f'embeddings/spectral{post_fix}.pt')
+        
+    return result
+
+def spectral_py(data, post_fix):
+    print('Setting up spectral embedding')
+    data.edge_index = to_undirected(data.edge_index)
+    np_edge_index = np.array(data.edge_index.T)
+
+    A = sparse.csr_matrix((np.ones(np_edge_index.shape[0]), (np_edge_index[:, 0], np_edge_index[:, 1])), shape=(data.num_nodes, data.num_nodes))
+    A = A + A.T
+
+    D = sparse.diags(np.array(A.sum(axis=1)).flatten())
+    L = D - A
+
+    vals, vecs = sparse.linalg.eigsh(L, k=128, which='SM')
+
+    result = torch.tensor(vecs).float()
     torch.save(result, f'embeddings/spectral{post_fix}.pt')
         
     return result
