@@ -104,6 +104,7 @@ def spectral(data, post_fix):
 
 # main
 def preprocess(data, preprocess = "diffusion", num_propagations = 10, p = None, alpha = None, use_cache = True, post_fix = ""):
+    os.makedirs("embeddings", exist_ok=True)
     if use_cache:
         try:
             x = torch.load(f'embeddings/{preprocess}{post_fix}.pt')
