@@ -137,10 +137,7 @@ class CaSRunner:
             else f"{self.lm_model_name}+{self.gnn_model_name}+{feature_type}"
         )
         if self.use_emb is not None:
-            if isinstance(self.use_emb, str):
-                method_name += f"+{self.use_emb}"
-            else:
-                method_name += f"+{'-'.join(self.use_emb)}"
+            method_name += f"+{self.use_emb}"
         if is_original:
             return method_name
         elif which_cas == "c":
@@ -244,7 +241,7 @@ class CaSRunner:
         feature_type = self.feature_type or "Ensemble"
         gnn_model_name = "None" if self.use_lm_pred else self.gnn_model_name
         result = all_params[self.dataset_name][self.lm_model_name][gnn_model_name]
-        if gnn_model_name == "MLP" and isinstance(self.use_emb, str):
+        if gnn_model_name == "MLP":
             return result[str(self.use_emb)][feature_type]
         return result[feature_type]
 

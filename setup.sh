@@ -18,3 +18,4 @@ pip install gdown
 
 # For spectral embedding
 pip install julia
+pip install h5py

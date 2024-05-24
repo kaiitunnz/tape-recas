@@ -1,5 +1,5 @@
 from time import time
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple
 
 import torch
 import numpy as np
@@ -76,20 +76,16 @@ class GNNTrainer():
         if self.gnn_model_name == "GCN":
             from core.GNNs.GCN.model import GCN as GNN
             self.use_emb = None
-            self.use_preprocessed_emb = None
         elif self.gnn_model_name == "SAGE":
             from core.GNNs.SAGE.model import SAGE as GNN
             self.use_emb = None
-            self.use_preprocessed_emb = None
         elif self.gnn_model_name == "MLP":
             from core.GNNs.MLP.model import MLP as GNN
             self.use_emb = cfg.gnn.train.use_emb
-            self.use_preprocessed_emb = cfg.gnn.train.use_preprocessed_emb
         else:
             print(f"Model {self.gnn_model_name} is not supported! Loading MLP ...")
             from core.GNNs.MLP.model import MLP as GNN
             self.use_emb = cfg.gnn.train.use_emb
-            self.use_preprocessed_emb = cfg.gnn.train.use_preprocessed_emb
         
         self.emb = self.load_emb(self.use_emb)
         self.preprocessed_emb = self.load_preprocess_emb(self.use_preprocessed_emb)
@@ -193,7 +189,7 @@ class GNNTrainer():
         res = {'val_acc': val_acc, 'test_acc': test_acc}
         return logits, res
 
-    def load_emb(self, use_emb: Optional[Union[str, list]]) -> Optional[torch.Tensor]:
+    def load_emb(self, use_emb: Optional[str]) -> Optional[torch.Tensor]:
         if use_emb is None:
             return None
         if use_emb == "node2vec":
@@ -202,6 +198,7 @@ class GNNTrainer():
             return torch.load(emb_path).to(self.device)
         else:
             prep_lst = []
-            for method in use_emb:
+            methods = use_emb.split('-')
+            for method in methods:
                 prep_lst.append(preprocess(self.dataset_name, method))
             return torch.cat(prep_lst, dim=1).to(self.device)
