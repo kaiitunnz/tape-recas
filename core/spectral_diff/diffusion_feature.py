@@ -14,6 +14,9 @@ from torch_scatter import scatter
 # import h5py
 import os
 
+# import community as community_louvain
+# import networkx as nx
+
 import numpy as np
 np.random.seed(0)
 
@@ -84,7 +87,7 @@ def community(data, post_fix):
 # spectral embedding
 def spectral(data, post_fix):
     try:
-        __import__(package)
+        __import__("julia")
     except ImportError:
         return spectral_py(data, post_fix)
     

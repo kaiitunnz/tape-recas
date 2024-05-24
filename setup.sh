@@ -19,3 +19,5 @@ pip install gdown
 # # For spectral embedding
 # pip install julia
 # pip install h5py
+# pip install networkx
+# pip install python-louvain
