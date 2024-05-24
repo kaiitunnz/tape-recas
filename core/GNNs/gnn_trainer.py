@@ -197,5 +197,5 @@ class GNNTrainer():
             prep_lst = []
             methods = use_emb.split('-')
             for method in methods:
-                prep_lst.append(preprocess(self.data, method))
+                prep_lst.append(preprocess(self.data.cpu(), method))
             return torch.cat(prep_lst, dim=1).to(self.device)
