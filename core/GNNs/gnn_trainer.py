@@ -1,5 +1,5 @@
 from time import time
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import torch
 import numpy as np
@@ -7,6 +7,7 @@ import numpy as np
 from core.GNNs.gnn_utils import EarlyStopping, get_ckpt_dir
 from core.data_utils.load import load_data, load_gpt_preds
 from core.utils import time_logger
+from core.spectral_diff.diffusion_feature import preprocess
 
 LOG_FREQ = 10
 
@@ -75,21 +76,29 @@ class GNNTrainer():
         if self.gnn_model_name == "GCN":
             from core.GNNs.GCN.model import GCN as GNN
             self.use_emb = None
+            self.use_preprocessed_emb = None
         elif self.gnn_model_name == "SAGE":
             from core.GNNs.SAGE.model import SAGE as GNN
             self.use_emb = None
+            self.use_preprocessed_emb = None
         elif self.gnn_model_name == "MLP":
             from core.GNNs.MLP.model import MLP as GNN
             self.use_emb = cfg.gnn.train.use_emb
+            self.use_preprocessed_emb = cfg.gnn.train.use_preprocessed_emb
         else:
             print(f"Model {self.gnn_model_name} is not supported! Loading MLP ...")
             from core.GNNs.MLP.model import MLP as GNN
             self.use_emb = cfg.gnn.train.use_emb
+            self.use_preprocessed_emb = cfg.gnn.train.use_preprocessed_emb
         
         self.emb = self.load_emb(self.use_emb)
+        self.preprocessed_emb = self.load_preprocess_emb(self.use_preprocessed_emb)
+
         feature_dim = self.hidden_dim*topk if use_pred else self.features.shape[1]
         if self.emb is not None:
             feature_dim += self.emb.shape[1]
+        if self.preprocessed_emb is not None:
+            feature_dim += self.preprocessed_emb.shape[1]
         self.model = GNN(in_channels=feature_dim,
                          hidden_channels=self.hidden_dim,
                          out_channels=self.num_classes,
@@ -184,12 +193,15 @@ class GNNTrainer():
         res = {'val_acc': val_acc, 'test_acc': test_acc}
         return logits, res
 
-    def load_emb(self, use_emb: Optional[str]) -> Optional[torch.Tensor]:
+    def load_emb(self, use_emb: Optional[Union[str, list]]) -> Optional[torch.Tensor]:
         if use_emb is None:
             return None
         if use_emb == "node2vec":
             from core.Node2Vec.node2vec import get_emb_fname
             emb_path = get_emb_fname(self.dataset_name, self.seed)
+            return torch.load(emb_path).to(self.device)
         else:
-            raise ValueError("Unsupported feature embeddings.")
-        return torch.load(emb_path).to(self.device)
+            prep_lst = []
+            for method in use_emb:
+                prep_lst.append(preprocess(self.dataset_name, method))
+            return torch.cat(prep_lst, dim=1).to(self.device)
