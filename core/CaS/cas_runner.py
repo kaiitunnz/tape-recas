@@ -86,7 +86,7 @@ class CaSRunner:
         )
         if self.use_emb is not None:
             method_name += f"+{self.use_emb}"
-        return method_name if is_original else method_name + "+C&S"
+        return method_name if is_original else method_name + "+CaS"
 
     def _add_eval_results(
         self,
