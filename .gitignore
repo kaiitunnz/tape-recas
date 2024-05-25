@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 gpt_responses
 logs
-results
+results*
 
 # TODO: remove this
 prt_lm_

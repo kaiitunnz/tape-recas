@@ -94,13 +94,16 @@ def set_cfg(cfg):
     cfg.cas = CN()
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
-    cfg.cas.train_only = False
+    cfg.cas.train_only = True
+    cfg.cas.cas_params_path = None
+    cfg.cas.recas_params_path = None
 
     # ------------------------------------------------------------------------ #
     # C&S Optuna options
     # ------------------------------------------------------------------------ #
     cfg.cas.optuna = CN()
     cfg.cas.optuna.n_jobs = 1
+    cfg.cas.optuna.n_trials = 100
 
     # ------------------------------------------------------------------------ #
     # Node2Vec options

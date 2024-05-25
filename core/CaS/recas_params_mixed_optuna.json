@@ -1,0 +1,1187 @@
+{
+  "arxiv_2023": {
+    "microsoft/deberta-base": {
+      "GCN": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.43297738013445175,
+            "A": 2,
+            "num_propagations": 60
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.293018194538969,
+            "A": 2,
+            "num_propagations": 70
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.6267907352221188,
+            "A": 0,
+            "num_propagations": 20
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.12480222697439906,
+            "A": 0,
+            "num_propagations": 100
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.6517490200068629,
+            "alpha2": 0.20044076616321913,
+            "A1": 0,
+            "A2": 2,
+            "num_propagations1": 100,
+            "num_propagations2": 100
+          }
+        ]
+      },
+      "MLP": {
+        "None": {
+          "TA": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.423360530546653,
+              "A": 1,
+              "num_propagations": 70
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.6638427237443962,
+              "A": 0,
+              "num_propagations": 20
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.520486443773625,
+              "A": 0,
+              "num_propagations": 90
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9976462391614435,
+              "alpha2": 0.18477275815179256,
+              "A1": 0,
+              "A2": 2,
+              "num_propagations1": 10,
+              "num_propagations2": 90
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.23367193335184896,
+              "A": 2,
+              "num_propagations": 90
+            }
+          ]
+        },
+        "node2vec": {
+          "TA": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.6246086887157933,
+              "alpha2": 0.2726802527238298,
+              "A1": 2,
+              "A2": 1,
+              "num_propagations1": 60,
+              "num_propagations2": 60
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9985315539178758,
+              "alpha2": 0.29158795160444034,
+              "A1": 0,
+              "A2": 0,
+              "num_propagations1": 80,
+              "num_propagations2": 20
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.22407132154002588,
+              "A": 1,
+              "num_propagations": 10
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.11519468626554791,
+              "A": 1,
+              "num_propagations": 100
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.189506401243699,
+              "A": 2,
+              "num_propagations": 70
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.5235629564893716,
+              "A": 0,
+              "num_propagations": 30
+            }
+          ]
+        }
+      },
+      "RevGAT": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.26548171589649405,
+            "A": 0,
+            "num_propagations": 80
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.4332110428248279,
+            "A": 0,
+            "num_propagations": 50
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.3668326829498498,
+            "A": 1,
+            "num_propagations": 30
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.14797177593355249,
+            "A": 0,
+            "num_propagations": 30
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.3060262643550028,
+            "A": 1,
+            "num_propagations": 40
+          }
+        ]
+      },
+      "SAGE": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.1973962547824223,
+            "A": 1,
+            "num_propagations": 70
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.5172360501179339,
+            "alpha2": 0.1814979686257511,
+            "A1": 2,
+            "A2": 1,
+            "num_propagations1": 50,
+            "num_propagations2": 60
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.2854981964224089,
+            "A": 2,
+            "num_propagations": 80
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.6510718681622301,
+            "A": 1,
+            "num_propagations": 40
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.3073742525762071,
+            "A": 0,
+            "num_propagations": 10
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.43019000463468265,
+            "alpha2": 0.10142933436899396,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 80,
+            "num_propagations2": 80
+          }
+        ]
+      },
+      "None": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.31897938533540304,
+            "A": 0,
+            "num_propagations": 100
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.10283651846195072,
+            "A": 0,
+            "num_propagations": 40
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.40472634065771806,
+            "A": 0,
+            "num_propagations": 40
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.10862920678515234,
+            "A": 0,
+            "num_propagations": 70
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.49829591242738586,
+            "A": 0,
+            "num_propagations": 100
+          }
+        ]
+      }
+    }
+  },
+  "ogbn-arxiv": {
+    "microsoft/deberta-base": {
+      "GCN": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.385860053501429,
+            "A": 0,
+            "num_propagations": 90
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.10177460381317013,
+            "A": 2,
+            "num_propagations": 100
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.6075900108453747,
+            "alpha2": 0.7230654455869698,
+            "A1": 1,
+            "A2": 2,
+            "num_propagations1": 30,
+            "num_propagations2": 20
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.27550745301881086,
+            "A": 0,
+            "num_propagations": 90
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.126849680821884,
+            "A": 2,
+            "num_propagations": 50
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.18427586217303657,
+            "A": 0,
+            "num_propagations": 10
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.11449373876819346,
+            "A": 2,
+            "num_propagations": 60
+          }
+        ]
+      },
+      "MLP": {
+        "None": {
+          "TA": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.1308669696958882,
+              "A": 1,
+              "num_propagations": 80
+            },
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.19238286767906548,
+              "alpha2": 0.817671118293885,
+              "A1": 0,
+              "A2": 0,
+              "num_propagations1": 60,
+              "num_propagations2": 40
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9938719639381028,
+              "alpha2": 0.7604970724743331,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 100,
+              "num_propagations2": 80
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9857591283004651,
+              "alpha2": 0.8170235826202631,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 10,
+              "num_propagations2": 100
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.964819864849908,
+              "alpha2": 0.741661533037082,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 30,
+              "num_propagations2": 80
+            }
+          ]
+        },
+        "node2vec": {
+          "TA": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.752468668683994,
+              "alpha2": 0.8034621190318467,
+              "A1": 1,
+              "A2": 0,
+              "num_propagations1": 50,
+              "num_propagations2": 50
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9907822347023896,
+              "alpha2": 0.7058736514185578,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 50,
+              "num_propagations2": 70
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.8122658350461495,
+              "A": 0,
+              "num_propagations": 80
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.7288905462502075,
+              "A": 0,
+              "num_propagations": 10
+            }
+          ]
+        }
+      },
+      "RevGAT": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.6500380055381005,
+            "alpha2": 0.7919978714046507,
+            "A1": 2,
+            "A2": 0,
+            "num_propagations1": 60,
+            "num_propagations2": 10
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.3902328255804686,
+            "A": 0,
+            "num_propagations": 10
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.8104601394198171,
+            "A": 1,
+            "num_propagations": 70
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.6516357399933768,
+            "A": 0,
+            "num_propagations": 50
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.4879772185778202,
+            "A": 2,
+            "num_propagations": 40
+          }
+        ]
+      },
+      "SAGE": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.7744759325670887,
+            "A": 0,
+            "num_propagations": 70
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.403680741331207,
+            "A": 0,
+            "num_propagations": 10
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.8326188594642925,
+            "A": 1,
+            "num_propagations": 50
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.7581915985939708,
+            "A": 0,
+            "num_propagations": 40
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.5588074547002468,
+            "A": 0,
+            "num_propagations": 70
+          }
+        ]
+      },
+      "None": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.1308669696958882,
+            "A": 1,
+            "num_propagations": 80
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.19238286767906548,
+            "alpha2": 0.817671118293885,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 60,
+            "num_propagations2": 40
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9938719639381028,
+            "alpha2": 0.7604970724743331,
+            "A1": 2,
+            "A2": 0,
+            "num_propagations1": 100,
+            "num_propagations2": 80
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9857591283004651,
+            "alpha2": 0.8170235826202631,
+            "A1": 2,
+            "A2": 0,
+            "num_propagations1": 10,
+            "num_propagations2": 100
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.964819864849908,
+            "alpha2": 0.741661533037082,
+            "A1": 2,
+            "A2": 0,
+            "num_propagations1": 30,
+            "num_propagations2": 80
+          }
+        ]
+      }
+    }
+  },
+  "cora": {
+    "microsoft/deberta-base": {
+      "GCN": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.779573628710307,
+            "alpha2": 0.23336700114614664,
+            "A1": 0,
+            "A2": 1,
+            "num_propagations1": 70,
+            "num_propagations2": 20
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9747615617638918,
+            "alpha2": 0.2226372436393879,
+            "A1": 1,
+            "A2": 1,
+            "num_propagations1": 60,
+            "num_propagations2": 50
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.691055686594733,
+            "A": 1,
+            "num_propagations": 10
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.17531579652440815,
+            "A": 2,
+            "num_propagations": 10
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.5447309612547659,
+            "A": 0,
+            "num_propagations": 60
+          }
+        ]
+      },
+      "MLP": {
+        "None": {
+          "TA": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.4346642893701443,
+              "alpha2": 0.3552696989815562,
+              "A1": 2,
+              "A2": 2,
+              "num_propagations1": 90,
+              "num_propagations2": 60
+            },
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.5270246871911912,
+              "alpha2": 0.43508715179608237,
+              "A1": 0,
+              "A2": 1,
+              "num_propagations1": 70,
+              "num_propagations2": 50
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.5754490607862218,
+              "alpha2": 0.4054482848457266,
+              "A1": 1,
+              "A2": 2,
+              "num_propagations1": 50,
+              "num_propagations2": 10
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.9978981508195672,
+              "A": 2,
+              "num_propagations": 30
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.347393063082029,
+              "alpha2": 0.7251279855733959,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 70,
+              "num_propagations2": 80
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.18722462556122918,
+              "A": 2,
+              "num_propagations": 30
+            },
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.5451207484055588,
+              "alpha2": 0.5587653079443622,
+              "A1": 0,
+              "A2": 0,
+              "num_propagations1": 10,
+              "num_propagations2": 50
+            }
+          ]
+        },
+        "node2vec": {
+          "TA": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.26423064685314523,
+              "A": 1,
+              "num_propagations": 90
+            },
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.5723634252110087,
+              "alpha2": 0.1981064767207215,
+              "A1": 1,
+              "A2": 2,
+              "num_propagations1": 10,
+              "num_propagations2": 30
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.49513833557702325,
+              "A": 0,
+              "num_propagations": 70
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.15927991257458257,
+              "A": 0,
+              "num_propagations": 60
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.5042019688331136,
+              "A": 1,
+              "num_propagations": 100
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.6470621300942018,
+              "alpha2": 0.583198139263834,
+              "A1": 2,
+              "A2": 0,
+              "num_propagations1": 90,
+              "num_propagations2": 80
+            }
+          ]
+        }
+      },
+      "RevGAT": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.8809544319083943,
+            "alpha2": 0.4270652618006314,
+            "A1": 0,
+            "A2": 1,
+            "num_propagations1": 50,
+            "num_propagations2": 10
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.6606008609896784,
+            "A": 1,
+            "num_propagations": 10
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.8393337321847161,
+            "alpha2": 0.5584417902888792,
+            "A1": 2,
+            "A2": 2,
+            "num_propagations1": 10,
+            "num_propagations2": 100
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.47781557519335405,
+            "A": 2,
+            "num_propagations": 40
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.2578036179326363,
+            "A": 1,
+            "num_propagations": 40
+          }
+        ]
+      },
+      "SAGE": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.3008911299407392,
+            "alpha2": 0.5462797378114812,
+            "A1": 2,
+            "A2": 1,
+            "num_propagations1": 80,
+            "num_propagations2": 30
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.602373974925634,
+            "alpha2": 0.3045469211605919,
+            "A1": 1,
+            "A2": 1,
+            "num_propagations1": 100,
+            "num_propagations2": 30
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.8454959556164583,
+            "A": 2,
+            "num_propagations": 10
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.40544271068151605,
+            "alpha2": 0.16855863324986622,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 80,
+            "num_propagations2": 60
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.4190689625911608,
+            "A": 1,
+            "num_propagations": 80
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9238978223870057,
+            "alpha2": 0.21928014967243,
+            "A1": 1,
+            "A2": 2,
+            "num_propagations1": 60,
+            "num_propagations2": 100
+          }
+        ]
+      },
+      "None": {
+        "TA": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.4562646344103861,
+            "A": 1,
+            "num_propagations": 80
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.10012020832762647,
+            "A": 1,
+            "num_propagations": 50
+          },
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.40373977952223145,
+            "alpha2": 0.7073816324736302,
+            "A1": 1,
+            "A2": 1,
+            "num_propagations1": 80,
+            "num_propagations2": 20
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.8100661223968223,
+            "A": 1,
+            "num_propagations": 100
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.5022949120373207,
+            "A": 0,
+            "num_propagations": 10
+          }
+        ]
+      }
+    }
+  },
+  "pubmed": {
+    "microsoft/deberta-base": {
+      "GCN": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.7728474805836042,
+            "alpha2": 0.12914570576661688,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 100,
+            "num_propagations2": 10
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.8447114335479629,
+            "alpha2": 0.2448729959424848,
+            "A1": 0,
+            "A2": 1,
+            "num_propagations1": 100,
+            "num_propagations2": 90
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9410731840528319,
+            "alpha2": 0.16257930320884048,
+            "A1": 1,
+            "A2": 0,
+            "num_propagations1": 100,
+            "num_propagations2": 10
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.10629178222660389,
+            "A": 1,
+            "num_propagations": 20
+          }
+        ]
+      },
+      "MLP": {
+        "None": {
+          "TA": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.8543627107017157,
+              "alpha2": 0.1833503592411862,
+              "A1": 1,
+              "A2": 1,
+              "num_propagations1": 50,
+              "num_propagations2": 90
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9959991889570545,
+              "alpha2": 0.18607597266171477,
+              "A1": 1,
+              "A2": 1,
+              "num_propagations1": 60,
+              "num_propagations2": 40
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "double_correlation_autoscale",
+              "alpha1": 0.9198667249760273,
+              "alpha2": 0.39036880258127593,
+              "A1": 2,
+              "A2": 1,
+              "num_propagations1": 80,
+              "num_propagations2": 80
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.19159879060582286,
+              "A": 2,
+              "num_propagations": 30
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.37769188907882006,
+              "A": 1,
+              "num_propagations": 50
+            },
+            {
+              "cas_fn": "only_double_correlation_autoscale",
+              "alpha": 0.48878102697570786,
+              "A": 2,
+              "num_propagations": 20
+            }
+          ]
+        },
+        "node2vec": {
+          "TA": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.1414830139909008,
+              "A": 0,
+              "num_propagations": 80
+            }
+          ],
+          "P": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.5399256295471087,
+              "A": 0,
+              "num_propagations": 20
+            }
+          ],
+          "E": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.4935297346991404,
+              "A": 1,
+              "num_propagations": 70
+            }
+          ],
+          "Ensemble": [
+            {
+              "cas_fn": "only_outcome_correlation",
+              "alpha": 0.45049720395374654,
+              "A": 0,
+              "num_propagations": 20
+            }
+          ]
+        }
+      },
+      "RevGAT": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9310009923195989,
+            "alpha2": 0.33450268650680126,
+            "A1": 1,
+            "A2": 0,
+            "num_propagations1": 80,
+            "num_propagations2": 70
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.7340279237814573,
+            "A": 1,
+            "num_propagations": 70
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.12524769843595127,
+            "A": 0,
+            "num_propagations": 100
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.21288084690628384,
+            "alpha2": 0.25195830685561765,
+            "A1": 0,
+            "A2": 1,
+            "num_propagations1": 60,
+            "num_propagations2": 100
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.44333469498005684,
+            "alpha2": 0.24150609207184456,
+            "A1": 2,
+            "A2": 1,
+            "num_propagations1": 100,
+            "num_propagations2": 30
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.5957367919114887,
+            "A": 1,
+            "num_propagations": 80
+          }
+        ]
+      },
+      "SAGE": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.5362418439958363,
+            "alpha2": 0.2355787279053421,
+            "A1": 1,
+            "A2": 1,
+            "num_propagations1": 80,
+            "num_propagations2": 40
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.5644818726719358,
+            "A": 1,
+            "num_propagations": 40
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.1551683923454841,
+            "A": 0,
+            "num_propagations": 60
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.11441520723338557,
+            "alpha2": 0.4105864961771213,
+            "A1": 1,
+            "A2": 0,
+            "num_propagations1": 30,
+            "num_propagations2": 70
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.98386049445762,
+            "A": 0,
+            "num_propagations": 40
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.6366210178245474,
+            "alpha2": 0.13065659405621888,
+            "A1": 1,
+            "A2": 0,
+            "num_propagations1": 60,
+            "num_propagations2": 90
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.8995801366477588,
+            "A": 2,
+            "num_propagations": 100
+          }
+        ]
+      },
+      "None": {
+        "TA": [
+          {
+            "cas_fn": "double_correlation_autoscale",
+            "alpha1": 0.9429082535865015,
+            "alpha2": 0.11800215627305871,
+            "A1": 0,
+            "A2": 0,
+            "num_propagations1": 40,
+            "num_propagations2": 60
+          }
+        ],
+        "P": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.1317490951358125,
+            "A": 0,
+            "num_propagations": 90
+          }
+        ],
+        "E": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.12673731253219453,
+            "A": 1,
+            "num_propagations": 40
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.925739346412281,
+            "A": 2,
+            "num_propagations": 40
+          }
+        ],
+        "Ensemble": [
+          {
+            "cas_fn": "only_outcome_correlation",
+            "alpha": 0.1060788228638877,
+            "A": 1,
+            "num_propagations": 20
+          },
+          {
+            "cas_fn": "only_double_correlation_autoscale",
+            "alpha": 0.8331026950005769,
+            "A": 2,
+            "num_propagations": 80
+          }
+        ]
+      }
+    }
+  }
+}

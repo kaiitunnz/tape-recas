@@ -13,9 +13,10 @@ import core.CaS.cas_utils as cas_utils
 from core.GNNs.gnn_utils import Evaluator, get_pred_fname
 from core.data_utils.load import load_data, load_gpt_preds
 from core.CaS.cas_utils import gen_normalized_adjs, process_adj
+from core.CaS.cas_params import CaSParams
 
 _CaSFnType = Callable[..., Tuple[torch.Tensor, torch.Tensor]]
-_CAS_PARAMS_FPATH = Path(__file__).parent.resolve() / "cas_params.json"
+_CAS_PARAMS_PATH = Path(__file__).parent.resolve() / "cas_params.json"
 
 
 class CaSRunner:
@@ -23,7 +24,7 @@ class CaSRunner:
         self,
         cfg: CN,
         feature_type: Optional[str],
-        params_fpath: Union[str, Path] = _CAS_PARAMS_FPATH,
+        params_path: Union[str, Path] = _CAS_PARAMS_PATH,
     ):
         self.seed = cfg.seed
         self.device = cfg.device
@@ -32,7 +33,11 @@ class CaSRunner:
         self.gnn_model_name = cfg.gnn.model.name  # Name of the predictor model
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
-        self.params_fpath = Path(params_fpath)
+        self.params_path = (
+            Path(params_path)
+            if cfg.cas.cas_params_path is None
+            else Path(cfg.cas.cas_params_path)
+        )
         self.use_emb = cfg.gnn.train.use_emb if self.gnn_model_name == "MLP" else None
         self.train_only = cfg.cas.train_only
 
@@ -236,20 +241,22 @@ class CaSRunner:
             raise ValueError("Input predictions do not sum to 1.")
 
     def _load_default_params(self) -> Dict[str, Any]:
-        with open(self.params_fpath, "r") as f:
-            all_params: Dict[str, Any] = json.load(f)
+        params = CaSParams(self.params_path)
         feature_type = self.feature_type or "Ensemble"
         gnn_model_name = "None" if self.use_lm_pred else self.gnn_model_name
-        result = all_params[self.dataset_name][self.lm_model_name][gnn_model_name]
-        if gnn_model_name == "MLP":
-            return result[str(self.use_emb)][feature_type]
-        return result[feature_type]
+        return params.get(
+            dataset=self.dataset_name,
+            lm_name=self.lm_model_name,
+            gnn_name=gnn_model_name,
+            feature_type=feature_type,
+            emb=self.use_emb,
+        )
 
     def _get_params(
         self,
         normalized_adjs: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
         params_dict: Optional[Dict[str, Any]],
-    ) -> Tuple[Dict[str, Any], Callable, str]:
+    ) -> Tuple[Dict[str, Any], _CaSFnType, str]:
         new_params_dict = (
             self._load_default_params() if params_dict is None else params_dict.copy()
         )
