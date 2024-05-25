@@ -1,57 +1,71 @@
 import sys
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import optuna  # type: ignore
 import pandas as pd
 from optuna.trial import Trial
 
 from core.config import cfg, update_cfg
-from core.CaS.cas_runner import CaSRunner
+from core.CaS.recas_runner import ReCaSRunner
 
 
-def suggest_params(trial: Trial) -> Dict[str, Any]:
-    cas_fn = trial.suggest_categorical(
-        "cas_fn",
+def suggest_params_list(trial: Trial) -> List[Dict[str, Any]]:
+    params_list = []
+
+    prefix = "first_"
+    first_cas_fn = trial.suggest_categorical(
+        prefix + "cas_fn",
         [
             "double_correlation_autoscale",
-            "double_correlation_fixed",
             "only_outcome_correlation",
         ],
     )
+    params_list.append(suggest_params(trial, first_cas_fn, prefix))
+
+    prefix = "second_"
+    second_cas_fn = trial.suggest_categorical(
+        prefix + "cas_fn",
+        # ["double_correlation_autoscale", "only_double_correlation_autoscale", None],
+        ["double_correlation_autoscale", "only_double_correlation_autoscale"],
+    )
+    if second_cas_fn is not None:
+        assert isinstance(second_cas_fn, str)  # for mypy
+        params_list.append(suggest_params(trial, second_cas_fn, prefix))
+
+    return params_list
+
+
+def suggest_params(trial: Trial, cas_fn: str, prefix: str = "") -> Dict[str, Any]:
     params_dict: Dict[str, Any]
     if cas_fn == "double_correlation_autoscale":
         params_dict = {
-            "alpha1": trial.suggest_float("alpha1", 0.1, 1.0),
-            "alpha2": trial.suggest_float("alpha2", 0.1, 1.0),
-            "A1": trial.suggest_int("A1", 0, 2),
-            "A2": trial.suggest_int("A2", 0, 2),
+            "alpha1": trial.suggest_float(prefix + "alpha1", 0.1, 1.0),
+            "alpha2": trial.suggest_float(prefix + "alpha2", 0.1, 1.0),
+            "A1": trial.suggest_int(prefix + "A1", 0, 2),
+            "A2": trial.suggest_int(prefix + "A2", 0, 2),
             "num_propagations1": trial.suggest_int(
-                "num_propagations1", 10, 100, step=10
+                prefix + "num_propagations1", 10, 100, step=10
             ),
             "num_propagations2": trial.suggest_int(
-                "num_propagations2", 10, 100, step=10
-            ),
-        }
-    elif cas_fn == "double_correlation_fixed":
-        params_dict = {
-            "alpha1": trial.suggest_float("alpha1", 0.1, 1.0),
-            "alpha2": trial.suggest_float("alpha2", 0.1, 1.0),
-            "scale": trial.suggest_float("scale", 5.0, 20.0),
-            "A1": trial.suggest_int("A1", 0, 2),
-            "A2": trial.suggest_int("A2", 0, 2),
-            "num_propagations1": trial.suggest_int(
-                "num_propagations1", 10, 100, step=10
-            ),
-            "num_propagations2": trial.suggest_int(
-                "num_propagations2", 10, 100, step=10
+                prefix + "num_propagations2", 10, 100, step=10
             ),
         }
     elif cas_fn == "only_outcome_correlation":
         params_dict = {
-            "alpha": trial.suggest_float("alpha", 0.1, 1.0),
-            "A": trial.suggest_int("A", 0, 2),
-            "num_propagations": trial.suggest_int("num_propagations", 10, 100, step=10),
+            "alpha": trial.suggest_float(prefix + "alpha", 0.1, 1.0),
+            "A": trial.suggest_int(prefix + "A", 0, 2),
+            "num_propagations": trial.suggest_int(
+                prefix + "num_propagations", 10, 100, step=10
+            ),
+        }
+    elif cas_fn == "only_double_correlation_autoscale":
+        params_dict = {
+            "alpha": trial.suggest_float(prefix + "alpha", 0.1, 1.0),
+            "A": trial.suggest_int(prefix + "A", 0, 2),
+            "num_propagations": trial.suggest_int(
+                prefix + "num_propagations", 10, 100, step=10
+            ),
         }
     else:
         raise ValueError(f"Unknown CaS function: {cas_fn}")
@@ -60,35 +74,35 @@ def suggest_params(trial: Trial) -> Dict[str, Any]:
 
 
 def objective(trial: Trial, feature_type: Optional[str], cfg) -> float:
-    params_dict = suggest_params(trial)
+    params_list = suggest_params_list(trial)
     old_seed = cfg.seed
     seeds = [cfg.seed] if cfg.seed is not None else range(cfg.runs)
     all_result_df = pd.DataFrame()
     for seed in seeds:
         cfg.seed = seed
-        runner = CaSRunner(cfg, feature_type)
-        tmp_result_df = runner.run(params_dict)[0]
+        runner = ReCaSRunner(cfg, feature_type)
+        tmp_result_df = runner.run(params_list)
         all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
 
     result_df = all_result_df[["method", "valid_acc"]].groupby("method")
     avg_df = result_df.mean()
-    score = avg_df.loc[runner._get_method_name(False, "s")].item()
+    score = avg_df.loc[runner._get_method_name(False)].item()
     cfg.seed = old_seed  # Restore the seed.
     return score
 
 
-def run(cfg, best_params_dict: Dict[str, Dict[str, Any]]):
+def run(cfg, best_params_dict: Dict[str, List[Dict[str, Any]]]):
     seeds = [cfg.seed] if cfg.seed is not None else range(cfg.runs)
     all_result_df = pd.DataFrame()
     start = time.time()
     for seed in seeds:
         cfg.seed = seed
         for feature_type in cfg.cas.feature_types:
-            runner = CaSRunner(cfg, feature_type)
+            runner = ReCaSRunner(cfg, feature_type)
             best_params = best_params_dict[feature_type]
-            method_name = runner._get_method_name(False, "s")
+            method_name = runner._get_method_name(False)
             print(f"Best parameters for '{method_name}': {best_params}")
-            tmp_result_df = runner.run(best_params)[0]
+            tmp_result_df = runner.run(best_params)
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
@@ -118,6 +132,18 @@ if __name__ == "__main__":
             n_trials=cfg.cas.optuna.n_trials,
             n_jobs=cfg.cas.optuna.n_jobs,
         )
-        best_params_dict[feature_type] = study.best_params
+        first_params = {
+            k[len("first_") :]: v
+            for k, v in study.best_params.items()
+            if k.startswith("first_")
+        }
+        second_params = {
+            k[len("second_") :]: v
+            for k, v in study.best_params.items()
+            if k.startswith("second_") and v is not None
+        }
+        best_params_dict[feature_type] = (
+            [first_params, second_params] if second_params else [first_params]
+        )
 
     run(cfg, best_params_dict)

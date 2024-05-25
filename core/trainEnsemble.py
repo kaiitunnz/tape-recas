@@ -29,6 +29,7 @@ def run(cfg):
                     ensembler.lm_model_name,
                     ensembler.gnn_model_name,
                     feature_type,
+                    ensembler.use_emb,
                     seed,
                 ),
             )

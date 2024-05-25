@@ -1,5 +1,5 @@
 from time import time
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import torch
 import numpy as np
@@ -7,6 +7,7 @@ import numpy as np
 from core.GNNs.gnn_utils import EarlyStopping, get_ckpt_dir
 from core.data_utils.load import load_data, load_gpt_preds
 from core.utils import time_logger
+from core.spectral_diff.diffusion_feature import preprocess
 
 LOG_FREQ = 10
 
@@ -74,15 +75,24 @@ class GNNTrainer():
 
         if self.gnn_model_name == "GCN":
             from core.GNNs.GCN.model import GCN as GNN
+            self.use_emb = None
         elif self.gnn_model_name == "SAGE":
             from core.GNNs.SAGE.model import SAGE as GNN
+            self.use_emb = None
         elif self.gnn_model_name == "MLP":
             from core.GNNs.MLP.model import MLP as GNN
+            self.use_emb = cfg.gnn.train.use_emb
         else:
             print(f"Model {self.gnn_model_name} is not supported! Loading MLP ...")
             from core.GNNs.MLP.model import MLP as GNN
+            self.use_emb = cfg.gnn.train.use_emb
+        
+        self.emb = self.load_emb(self.use_emb)
 
-        self.model = GNN(in_channels=self.hidden_dim*topk if use_pred else self.features.shape[1],
+        feature_dim = self.hidden_dim*topk if use_pred else self.features.shape[1]
+        if self.emb is not None:
+            feature_dim += self.emb.shape[1]
+        self.model = GNN(in_channels=feature_dim,
                          hidden_channels=self.hidden_dim,
                          out_channels=self.num_classes,
                          num_layers=self.num_layers,
@@ -97,7 +107,10 @@ class GNNTrainer():
 
         print(f"\nNumber of parameters: {trainable_params}")
         self.ckpt_dir = get_ckpt_dir(self.dataset_name)
-        self.ckpt = f"{self.ckpt_dir}/{self.gnn_model_name}_{self.feature_type}.pt"
+        if self.use_emb is None:
+            self.ckpt = f"{self.ckpt_dir}/{self.gnn_model_name}_{self.feature_type}.pt"
+        else:
+            self.ckpt = f"{self.ckpt_dir}/{self.gnn_model_name}_{self.feature_type}_{self.use_emb}.pt"
         self.stopper = EarlyStopping(
             patience=cfg.gnn.train.early_stop, path=self.ckpt) if cfg.gnn.train.early_stop > 0 else None
         self.loss_func = torch.nn.CrossEntropyLoss()
@@ -109,8 +122,11 @@ class GNNTrainer():
              "y_true": labels.view(-1, 1)}
         )["acc"]
 
-    def _forward(self, x, edge_index):
-        logits = self.model(x, edge_index)  # small-graph
+    def _forward(self, x, emb, edge_index):
+        if emb is None:
+            logits = self.model(x, edge_index)  # small-graph
+        else:
+            logits = self.model(x, edge_index, emb=emb)  # large-graph
         return logits
 
     def _train(self):
@@ -118,7 +134,7 @@ class GNNTrainer():
         self.model.train()
         self.optimizer.zero_grad()
         # ! Specific
-        logits = self._forward(self.features, self.data.edge_index)
+        logits = self._forward(self.features, self.emb, self.data.edge_index)
         loss = self.loss_func(
             logits[self.data.train_mask], self.data.y[self.data.train_mask])
         train_acc = self.evaluator(
@@ -131,7 +147,7 @@ class GNNTrainer():
     @ torch.no_grad()
     def _evaluate(self):
         self.model.eval()
-        logits = self._forward(self.features, self.data.edge_index)
+        logits = self._forward(self.features, self.emb, self.data.edge_index)
         val_acc = self.evaluator(
             logits[self.data.val_mask], self.data.y[self.data.val_mask])
         test_acc = self.evaluator(
@@ -169,3 +185,17 @@ class GNNTrainer():
             f'[{self.gnn_model_name} + {self.feature_type}] ValAcc: {val_acc:.4f}, TestAcc: {test_acc:.4f}\n')
         res = {'val_acc': val_acc, 'test_acc': test_acc}
         return logits, res
+
+    def load_emb(self, use_emb: Optional[str]) -> Optional[torch.Tensor]:
+        if use_emb is None:
+            return None
+        if use_emb == "node2vec":
+            from core.Node2Vec.node2vec import get_emb_fname
+            emb_path = get_emb_fname(self.dataset_name, self.seed)
+            return torch.load(emb_path).to(self.device)
+        else:
+            prep_lst = []
+            methods = use_emb.split('-')
+            for method in methods:
+                prep_lst.append(preprocess(self.data.cpu(), method))
+            return torch.cat(prep_lst, dim=1).to(self.device)

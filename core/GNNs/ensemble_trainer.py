@@ -25,6 +25,7 @@ class EnsembleTrainer():
         self.feature_type = cfg.gnn.train.feature_type
         self.epochs = cfg.gnn.train.epochs
         self.weight_decay = cfg.gnn.train.weight_decay
+        self.use_emb = cfg.gnn.train.use_emb if self.gnn_model_name == "MLP" else None
 
         self.ckpt_dir = get_ckpt_dir(self.dataset_name)
 

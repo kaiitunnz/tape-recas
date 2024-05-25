@@ -26,10 +26,12 @@ class MLP(torch.nn.Module):
         for bn in self.bns:
             bn.reset_parameters()
 
-    def forward(self, x, adj_t=None):
+    def forward(self, x, adj_t=None, emb=None):
         if self.use_pred:
             x = self.encoder(x)
             x = torch.flatten(x, start_dim=1)
+        if emb is not None:
+            x = torch.cat([x, emb], dim=1)
         for i, conv in enumerate(self.convs[:-1]):
             x = conv(x)
             x = self.bns[i](x)

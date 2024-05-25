@@ -61,7 +61,6 @@ def double_correlation_autoscale(
     A2: torch.Tensor,
     alpha2: float,
     num_propagations2: int,
-    scale: float = 1.0,
     train_only: bool = False,
     device: str = _DEVICE,
     display: bool = False,
@@ -73,27 +72,16 @@ def double_correlation_autoscale(
         label_idx = torch.cat([split_idx["train"], split_idx["valid"]])
         residual_idx = label_idx
 
-    y = pre_residual_correlation(
-        labels=data.y.data, model_out=model_out, label_idx=residual_idx
-    )
-    resid = general_outcome_correlation(
-        adj=A1,
-        y=y,
-        alpha=alpha1,
-        num_propagations=num_propagations1,
-        post_step=lambda x: torch.clamp(x, -1.0, 1.0),
-        alpha_term=True,
-        display=display,
+    res_result = _double_correlation_autoscale_helper(
+        data,
+        model_out,
+        residual_idx,
+        A1,
+        alpha1,
+        num_propagations1,
         device=device,
+        display=display,
     )
-
-    orig_diff = y[residual_idx].abs().sum() / residual_idx.shape[0]
-    resid_scale = orig_diff / resid.abs().sum(dim=1, keepdim=True)
-    resid_scale[resid_scale.isinf()] = 1.0
-    cur_idxs = resid_scale > 1000
-    resid_scale[cur_idxs] = 1.0
-    res_result = model_out + resid_scale * resid
-    res_result[res_result.isnan()] = model_out[res_result.isnan()]
     y = pre_outcome_correlation(
         labels=data.y.data, model_out=res_result, label_idx=label_idx
     )
@@ -163,27 +151,17 @@ def double_correlation_fixed(
         label_idx = torch.cat([split_idx["train"], split_idx["valid"]])
         residual_idx = label_idx
 
-    y = pre_residual_correlation(
-        labels=data.y.data, model_out=model_out, label_idx=residual_idx
-    )
-
-    fix_y = y[residual_idx].to(device)
-
-    def fix_inputs(x):
-        x[residual_idx] = fix_y
-        return x
-
-    resid = general_outcome_correlation(
-        adj=A1,
-        y=y,
-        alpha=alpha1,
-        num_propagations=num_propagations1,
-        post_step=lambda x: fix_inputs(x),
-        alpha_term=True,
-        display=display,
+    res_result = _double_correlation_fixed_helper(
+        data,
+        model_out,
+        residual_idx,
+        A1,
+        alpha1,
+        num_propagations1,
+        scale=scale,
         device=device,
+        display=display,
     )
-    res_result = model_out + scale * resid
 
     y = pre_outcome_correlation(
         labels=data.y.data, model_out=res_result, label_idx=label_idx
@@ -201,6 +179,145 @@ def double_correlation_fixed(
     )
 
     return res_result, result
+
+
+def only_double_correlation_autoscale(
+    data: BaseData,
+    model_out: torch.Tensor,
+    split_idx: Dict[str, torch.Tensor],
+    A: torch.Tensor,
+    alpha: float,
+    num_propagations: int,
+    train_only: bool = False,
+    device: str = _DEVICE,
+    display: bool = False,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    orig_result = model_out.clone()
+    if train_only:
+        label_idx = torch.cat([split_idx["train"]])
+        residual_idx = split_idx["train"]
+    else:
+        label_idx = torch.cat([split_idx["train"], split_idx["valid"]])
+        residual_idx = label_idx
+
+    res_result = _double_correlation_autoscale_helper(
+        data,
+        model_out,
+        residual_idx,
+        A,
+        alpha,
+        num_propagations,
+        device=device,
+        display=display,
+    )
+
+    return orig_result, res_result
+
+
+def only_double_correlation_fixed(
+    data: BaseData,
+    model_out: torch.Tensor,
+    split_idx: Dict[str, torch.Tensor],
+    A: torch.Tensor,
+    alpha: float,
+    num_propagations: int,
+    train_only: bool = False,
+    scale: float = 1.0,
+    device: str = _DEVICE,
+    display: bool = False,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    orig_result = model_out.clone()
+    if train_only:
+        label_idx = torch.cat([split_idx["train"]])
+        residual_idx = split_idx["train"]
+    else:
+        label_idx = torch.cat([split_idx["train"], split_idx["valid"]])
+        residual_idx = label_idx
+
+    res_result = _double_correlation_fixed_helper(
+        data,
+        model_out,
+        residual_idx,
+        A,
+        alpha,
+        num_propagations,
+        scale=scale,
+        device=device,
+        display=display,
+    )
+
+    return orig_result, res_result
+
+
+def _double_correlation_autoscale_helper(
+    data: BaseData,
+    model_out: torch.Tensor,
+    residual_idx: torch.Tensor,
+    A: torch.Tensor,
+    alpha: float,
+    num_propagations: int,
+    device: str = _DEVICE,
+    display: bool = False,
+) -> torch.Tensor:
+    y = pre_residual_correlation(
+        labels=data.y.data, model_out=model_out, label_idx=residual_idx
+    )
+    resid = general_outcome_correlation(
+        adj=A,
+        y=y,
+        alpha=alpha,
+        num_propagations=num_propagations,
+        post_step=lambda x: torch.clamp(x, -1.0, 1.0),
+        alpha_term=True,
+        display=display,
+        device=device,
+    )
+
+    orig_diff = y[residual_idx].abs().sum() / residual_idx.shape[0]
+    resid_scale = orig_diff / resid.abs().sum(dim=1, keepdim=True)
+    resid_scale[resid_scale.isinf()] = 1.0
+    cur_idxs = resid_scale > 1000
+    resid_scale[cur_idxs] = 1.0
+    res_result = model_out + resid_scale * resid
+    res_result[res_result.isnan()] = model_out[res_result.isnan()]
+
+    return res_result
+
+
+def _double_correlation_fixed_helper(
+    data: BaseData,
+    model_out: torch.Tensor,
+    residual_idx: torch.Tensor,
+    A: torch.Tensor,
+    alpha: float,
+    num_propagations: int,
+    scale: float = 1.0,
+    device: str = _DEVICE,
+    display: bool = False,
+) -> torch.Tensor:
+    y = pre_residual_correlation(
+        labels=data.y.data, model_out=model_out, label_idx=residual_idx
+    )
+
+    fix_y = y[residual_idx].to(device)
+
+    def fix_inputs(x):
+        x[residual_idx] = fix_y
+        return x
+
+    resid = general_outcome_correlation(
+        adj=A,
+        y=y,
+        alpha=alpha,
+        num_propagations=num_propagations,
+        post_step=lambda x: fix_inputs(x),
+        alpha_term=True,
+        display=display,
+        device=device,
+    )
+    res_result = model_out + scale * resid
+
+    return res_result
 
 
 def label_propagation(

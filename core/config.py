@@ -49,6 +49,7 @@ def set_cfg(cfg):
     cfg.gnn.train.wd = 0.0
     # Dropout rate
     cfg.gnn.train.dropout = 0.0
+    cfg.gnn.train.use_emb = None
 
     # ------------------------------------------------------------------------ #
     # LM Model options
@@ -93,12 +94,25 @@ def set_cfg(cfg):
     cfg.cas = CN()
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
+    cfg.cas.train_only = True
+    cfg.cas.cas_params_path = None
+    cfg.cas.recas_params_path = None
 
     # ------------------------------------------------------------------------ #
     # C&S Optuna options
     # ------------------------------------------------------------------------ #
     cfg.cas.optuna = CN()
     cfg.cas.optuna.n_jobs = 1
+    cfg.cas.optuna.n_trials = 100
+
+    # ------------------------------------------------------------------------ #
+    # Node2Vec options
+    # ------------------------------------------------------------------------ #
+    cfg.node2vec = CN()
+    cfg.node2vec.epochs = 100
+    cfg.node2vec.batch_size = 128
+    cfg.node2vec.num_workers = 4
+    cfg.node2vec.max_iter = 300
 
     return cfg
 

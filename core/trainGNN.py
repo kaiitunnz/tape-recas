@@ -33,6 +33,7 @@ def run(cfg):
                 trainer.lm_model_name,
                 trainer.gnn_model_name,
                 trainer.feature_type,
+                trainer.use_emb,
                 seed,
             ),
         )
