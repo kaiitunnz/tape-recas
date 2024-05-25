@@ -7,6 +7,7 @@ import numpy as np
 from core.GNNs.gnn_utils import EarlyStopping, get_ckpt_dir
 from core.data_utils.load import load_data, load_gpt_preds
 from core.utils import time_logger
+from core.spectral_diff.diffusion_feature import preprocess
 
 LOG_FREQ = 10
 
@@ -87,6 +88,7 @@ class GNNTrainer():
             self.use_emb = cfg.gnn.train.use_emb
         
         self.emb = self.load_emb(self.use_emb)
+
         feature_dim = self.hidden_dim*topk if use_pred else self.features.shape[1]
         if self.emb is not None:
             feature_dim += self.emb.shape[1]
@@ -190,6 +192,10 @@ class GNNTrainer():
         if use_emb == "node2vec":
             from core.Node2Vec.node2vec import get_emb_fname
             emb_path = get_emb_fname(self.dataset_name, self.seed)
+            return torch.load(emb_path).to(self.device)
         else:
-            raise ValueError("Unsupported feature embeddings.")
-        return torch.load(emb_path).to(self.device)
+            prep_lst = []
+            methods = use_emb.split('-')
+            for method in methods:
+                prep_lst.append(preprocess(self.data.cpu(), method))
+            return torch.cat(prep_lst, dim=1).to(self.device)
