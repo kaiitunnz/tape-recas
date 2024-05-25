@@ -16,7 +16,6 @@ from core.CaS.cas_utils import gen_normalized_adjs, process_adj
 from core.CaS.recas_params import ReCaSParams
 
 _CaSFnType = Callable[..., Tuple[torch.Tensor, torch.Tensor]]
-_CAS_PARAMS_PATH = Path(__file__).parent.resolve() / "recas_params_default.json"
 
 
 class ReCaSRunner:
@@ -24,7 +23,7 @@ class ReCaSRunner:
         self,
         cfg: CN,
         feature_type: Optional[str],
-        params_path: Union[str, Path] = _CAS_PARAMS_PATH,
+        params_path: Optional[Union[str, Path]] = None,
     ):
         self.seed = cfg.seed
         self.device = cfg.device
@@ -33,10 +32,8 @@ class ReCaSRunner:
         self.gnn_model_name = cfg.gnn.model.name  # Name of the predictor model
         self.feature_type = feature_type
         self.use_lm_pred = cfg.cas.use_lm_pred
-        self.params_path = (
-            Path(params_path)
-            if cfg.cas.recas_params_path is None
-            else Path(cfg.cas.recas_params_path)
+        self.params_path = Path(
+            cfg.cas.recas_params_path if params_path is None else params_path
         )
         self.use_emb = cfg.gnn.train.use_emb if self.gnn_model_name == "MLP" else None
         self.train_only = cfg.cas.train_only

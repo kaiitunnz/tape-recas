@@ -1,5 +1,6 @@
 import os
 import argparse
+from pathlib import Path
 from yacs.config import CfgNode as CN       # type: ignore
 
 
@@ -95,8 +96,8 @@ def set_cfg(cfg):
     cfg.cas.use_lm_pred = False
     cfg.cas.feature_types = ["TA", "P", "E", None]
     cfg.cas.train_only = True
-    cfg.cas.cas_params_path = None
-    cfg.cas.recas_params_path = None
+    cfg.cas.cas_params_path =  str(Path(__file__).parent.resolve() / "CaS/cas_params.json")
+    cfg.cas.recas_params_path = str(Path(__file__).parent.resolve() / "CaS/recas_params_default.json")
 
     # ------------------------------------------------------------------------ #
     # C&S Optuna options
