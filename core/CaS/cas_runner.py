@@ -154,7 +154,6 @@ class CaSRunner:
         new_params_dict = (
             self._load_default_params() if params_dict is None else params_dict.copy()
         )
-        saved_params_dict = new_params_dict.copy()  # TODO: remove this
 
         cas_fn = new_params_dict.pop("cas_fn")
         new_params_dict["device"] = self.device
@@ -183,16 +182,6 @@ class CaSRunner:
             )
         else:
             raise ValueError(f"Unknown CaS function: {cas_fn}")
-
-        # Debug
-        debug_params = new_params_dict.copy()
-        if "A1" in debug_params:
-            debug_params["A1"] = saved_params_dict["A1"]
-        if "A2" in debug_params:
-            debug_params["A2"] = saved_params_dict["A2"]
-        if "A" in debug_params:
-            debug_params["A"] = saved_params_dict["A"]
-        print("params_dict:", debug_params)
 
         return new_params_dict, getattr(cas_utils, cas_fn), cas_fn
 

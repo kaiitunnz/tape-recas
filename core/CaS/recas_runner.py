@@ -164,7 +164,6 @@ class ReCaSRunner:
         new_params_list = (
             self._load_default_params() if params_list is None else copy(params_list)
         )
-        saved_params_list = copy(new_params_list)  # TODO: remove this
         cas_fn_list = []
         cas_fn_str_list = []
 
@@ -209,17 +208,6 @@ class ReCaSRunner:
 
             cas_fn_list.append(getattr(cas_utils, cas_fn))
             cas_fn_str_list.append(cas_fn)
-
-        # TODO: remove debug
-        debug_params_list = copy(new_params_list)
-        for debug_params_dict, params_dict in zip(debug_params_list, saved_params_list):
-            if "A1" in debug_params_dict:
-                debug_params_dict["A1"] = params_dict["A1"]
-            if "A2" in debug_params_dict:
-                debug_params_dict["A2"] = params_dict["A2"]
-            if "A" in debug_params_dict:
-                debug_params_dict["A"] = params_dict["A"]
-        print("params_list:", debug_params_list)
 
         return new_params_list, cas_fn_list, cas_fn_str_list
 
