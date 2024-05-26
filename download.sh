@@ -1,3 +1,4 @@
+# --------------------------------
 # Download original text attributes
 cd dataset
 
@@ -22,7 +23,9 @@ unzip PubMed_orig.zip
 rm PubMed_orig.zip
 
 cd -
+# --------------------------------
 
+# --------------------------------
 # Download LLM responses
 mkdir -p gpt_responses
 cd gpt_responses
@@ -58,24 +61,22 @@ unzip PubMed.zip
 rm PubMed.zip
 
 cd -
+# --------------------------------
 
+# --------------------------------
 # Download LM predictions and features
-gdown 1vywgfqge2_O6kf3emtG7TiQD0oWdiz9v
+wget --no-check-certificate \
+    "https://kaistackr-my.sharepoint.com/:u:/g/personal/noppanat_w_kaist_ac_kr/ETvD-ai69VtOlwLtmAGJGnYBoTZLLlVlmLkiMiw8h8Mjqg?e=qoYu1y&download=1" \
+    -O prt_lm.zip
 unzip prt_lm.zip
 rm prt_lm.zip
+# --------------------------------
 
-# arxiv_2023
-# gdown https://drive.google.com/drive/folders/1QV0Ihwtfcgj6bjHktKzvDcDqoMuyZa7M --folder
-
-# cd prt_lm
-# # cora
-# gdown https://drive.google.com/drive/folders/1mR_qtWhzH-LX34n4SaFnDFefcKovaVxy --folder
-# gdown https://drive.google.com/drive/folders/1LrMVAaD5Lu2fvJ_SghfgsyiVeyhjDXv6 --folder
-# # ogbn-arxiv
-# gdown https://drive.google.com/drive/folders/1YebF5eo_Hm4A7CPrDDbq900UCE95iWOv --folder
-# gdown https://drive.google.com/drive/folders/1cgdkU9pCNpZ3D7MA3lOx3x5s3OFDU6t5 --folder
-# # pubmed
-# gdown https://drive.google.com/drive/folders/1wys171LrFJA9Hx__1Fj_2K3SWwQfTsGg --folder
-# gdown https://drive.google.com/drive/folders/1Kufal4btFKT7sYNVxoxIyhDiY3YBpsGn --folder
-
-# cd -
+# --------------------------------
+# Download GNN predictions
+wget --no-check-certificate \
+    "https://kaistackr-my.sharepoint.com/:u:/g/personal/noppanat_w_kaist_ac_kr/EV2Ni_9nMh5Mkg7qljfvOnUBbkP67rQEcgV1Qii3ABHoiQ?e=yBc0Of&download=1" \
+    -O output.zip
+unzip output.zip
+rm output.zip
+# --------------------------------

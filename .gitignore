@@ -1,13 +1,15 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
 gpt_responses
 logs
 results*
+output*
 
 # TODO: remove this
 prt_lm_
 sep_cas_rets
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
 
 # C extensions
 *.so
