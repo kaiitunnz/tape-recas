@@ -23,13 +23,13 @@ class CaSParams(BaseParams):
 
     def add(
         self,
+        params: Dict[str, Any],
         *,
         dataset: str,
         gnn_name: str,
         lm_name: str = "microsoft/deberta-base",
         feature_type: str = "Ensemble",
         emb: Optional[str] = None,
-        params: Dict[str, Any],
     ):
         self._add(
             params,

@@ -170,7 +170,7 @@ class ReCaSRunner:
 
         for params_dict in new_params_list:
             cas_fn = params_dict.pop("cas_fn")
-
+            params_dict["device"] = self.device
             if cas_fn == "double_correlation_autoscale":
                 params_dict.update(
                     {

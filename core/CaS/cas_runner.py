@@ -260,7 +260,7 @@ class CaSRunner:
         saved_params_dict = new_params_dict.copy()  # TODO: remove this
 
         cas_fn = new_params_dict.pop("cas_fn")
-
+        new_params_dict["device"] = self.device
         if cas_fn == "double_correlation_autoscale":
             new_params_dict.update(
                 {
