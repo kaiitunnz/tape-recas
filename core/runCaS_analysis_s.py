@@ -67,12 +67,12 @@ def objective(trial: Trial, feature_type: Optional[str], cfg) -> float:
     for seed in seeds:
         cfg.seed = seed
         runner = CaSRunner(cfg, feature_type)
-        tmp_result_df = runner.run(params_dict)[0]
+        tmp_result_df = runner.run(params_dict)
         all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
 
     result_df = all_result_df[["method", "valid_acc"]].groupby("method")
     avg_df = result_df.mean()
-    score = avg_df.loc[runner._get_method_name(False, "s")].item()
+    score = avg_df.loc[runner._get_method_name(False)].item()
     cfg.seed = old_seed  # Restore the seed.
     return score
 
@@ -86,9 +86,9 @@ def run(cfg, best_params_dict: Dict[str, Dict[str, Any]]):
         for feature_type in cfg.cas.feature_types:
             runner = CaSRunner(cfg, feature_type)
             best_params = best_params_dict[feature_type]
-            method_name = runner._get_method_name(False, "s")
+            method_name = runner._get_method_name(False)
             print(f"Best parameters for '{method_name}': {best_params}")
-            tmp_result_df = runner.run(best_params)[0]
+            tmp_result_df = runner.run(best_params)
             all_result_df = pd.concat([all_result_df, tmp_result_df], ignore_index=True)
     end = time.time()
 
@@ -101,7 +101,7 @@ def run(cfg, best_params_dict: Dict[str, Dict[str, Any]]):
         print(
             f"[{method}] "
             f'TrainACC: {avg_row["train_acc"]:.4f} ± {std_row["train_acc"]:.4f}, '
-            f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]}, '
+            f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]:.4f}, '
             f'TestACC: {avg_row["test_acc"]:.4f} ± {std_row["test_acc"]:.4f}'
         )
     print(f"Running time: {round((end-start)/len(seeds), 2)}s")

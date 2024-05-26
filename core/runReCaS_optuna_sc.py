@@ -116,7 +116,7 @@ def run(cfg, best_params_dict: Dict[str, List[Dict[str, Any]]]):
         print(
             f"[{method}] "
             f'TrainACC: {avg_row["train_acc"]:.4f} ± {std_row["train_acc"]:.4f}, '
-            f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]}, '
+            f'ValACC: {avg_row["valid_acc"]:.4f} ± {std_row["valid_acc"]:.4f}, '
             f'TestACC: {avg_row["test_acc"]:.4f} ± {std_row["test_acc"]:.4f}'
         )
     print(f"Running time: {round((end-start)/len(seeds), 2)}s")
