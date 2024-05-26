@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
@@ -51,9 +50,7 @@ class CaSRunner:
 
         self.evaluator = Evaluator(name=self.dataset_name)
 
-    def run(
-        self, params_dict: Optional[Dict[str, Any]] = None
-    ) -> Tuple[pd.DataFrame, ...]:
+    def run(self, params_dict: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
         adj, D_isqrt = process_adj(self.data)
         normalized_adjs = gen_normalized_adjs(adj, D_isqrt)
 
@@ -65,73 +62,18 @@ class CaSRunner:
             model_preds = self._load_gnn_pred()
 
         result_df = pd.DataFrame()
-        _, eval_results, eval_results_raw_none = self.evaluate_original_preds(
-            model_preds
-        )
+        eval_results = self.evaluate_original_preds(model_preds)
         result_df = self._add_eval_results(
             result_df, self._get_method_name(True), eval_results, cas_fn_str
         )
-        _, eval_results, eval_results_raw_c = self.evaluate_c_preds(
-            model_preds, cas_params, cas_fn
-        )
+        eval_results = self.evaluate_cas_preds(model_preds, cas_params, cas_fn)
         result_df = self._add_eval_results(
-            result_df, self._get_method_name(False, "c"), eval_results, cas_fn_str
-        )
-        _, eval_results, eval_results_raw_s = self.evaluate_s_preds(
-            model_preds, cas_params, cas_fn
-        )
-        result_df = self._add_eval_results(
-            result_df, self._get_method_name(False, "s"), eval_results, cas_fn_str
-        )
-        raw_change_train_df = self.check_pred_change(
-            eval_results_raw_none["train"],
-            eval_results_raw_c["train"],
-            eval_results_raw_s["train"],
-        )
-        raw_change_valid_df = self.check_pred_change(
-            eval_results_raw_none["valid"],
-            eval_results_raw_c["valid"],
-            eval_results_raw_s["valid"],
-        )
-        raw_change_test_df = self.check_pred_change(
-            eval_results_raw_none["test"],
-            eval_results_raw_c["test"],
-            eval_results_raw_s["test"],
+            result_df, self._get_method_name(False), eval_results, cas_fn_str
         )
 
-        return result_df, raw_change_train_df, raw_change_valid_df, raw_change_test_df
+        return result_df
 
-    def check_pred_change(
-        self, raw_none_np: np.ndarray, raw_c_np: np.ndarray, raw_r_np: np.ndarray
-    ) -> pd.DataFrame:
-        raw_all_np = np.concatenate([raw_none_np, raw_c_np, raw_r_np], axis=1)
-        raw_diff_np = np.diff(raw_all_np.astype(int), axis=1)
-        raw_change = pd.DataFrame(raw_diff_np, columns=["None-C", "C-S"])
-        # for deep analysis of the change
-        raw_change["FT"] = raw_change.apply(
-            lambda x: True if x["None-C"] == -1 and x["C-S"] == 1 else False, axis=1
-        )
-        raw_change["TF"] = raw_change.apply(
-            lambda x: True if x["None-C"] == 1 and x["C-S"] == -1 else False, axis=1
-        )
-        raw_change["NT"] = raw_change.apply(
-            lambda x: True if x["None-C"] == 0 and x["C-S"] == 1 else False, axis=1
-        )
-        raw_change["TN"] = raw_change.apply(
-            lambda x: True if x["None-C"] == 1 and x["C-S"] == 0 else False, axis=1
-        )
-        raw_change["NF"] = raw_change.apply(
-            lambda x: True if x["None-C"] == 0 and x["C-S"] == -1 else False, axis=1
-        )
-        raw_change["FN"] = raw_change.apply(
-            lambda x: True if x["None-C"] == -1 and x["C-S"] == 0 else False, axis=1
-        )
-        raw_change["NN"] = raw_change.apply(
-            lambda x: True if x["None-C"] == 0 and x["C-S"] == 0 else False, axis=1
-        )
-        return raw_change
-
-    def _get_method_name(self, is_original: bool, which_cas: str = "") -> str:
+    def _get_method_name(self, is_original: bool) -> str:
         feature_type = "Ensemble" if self.feature_type is None else self.feature_type
         method_name = (
             f"{self.lm_model_name}+{feature_type}"
@@ -140,14 +82,7 @@ class CaSRunner:
         )
         if self.use_emb is not None:
             method_name += f"+{self.use_emb}"
-        if is_original:
-            return method_name
-        elif which_cas == "c":
-            return method_name + "+C"
-        elif which_cas == "s":
-            return method_name + "+S"
-        else:
-            raise ValueError("Invalid which_cas")
+        return method_name if is_original else method_name + "+CaS"
 
     def _add_eval_results(
         self,
@@ -171,67 +106,29 @@ class CaSRunner:
             ]
         )
 
-    def _eval(self, preds: torch.Tensor, split: str) -> Dict[str, Any]:
+    def _eval(self, preds: torch.Tensor, split: str) -> float:
         idx = self.split_idx[split]
         return self.evaluator.eval(
             {
                 "y_true": self.data.y[idx].view((-1, 1)),
                 "y_pred": preds[idx].argmax(dim=-1, keepdim=True),
             }
-        )
+        )["acc"]
 
     def evaluate_original_preds(
         self, preds: torch.Tensor
-    ) -> Tuple[torch.Tensor, Dict[str, Any], Dict[str, Any]]:
+    ) -> Dict[str, float]:
         self._validate_preds(preds)
-        split_acc = {
-            split: self._eval(preds, split)["acc"]
-            for split in ["train", "valid", "test"]
-        }
-        split_correct = {
-            split: self._eval(preds, split)["correct"]
-            for split in ["train", "valid", "test"]
-        }
-        return preds, split_acc, split_correct
+        return {split: self._eval(preds, split) for split in ["train", "valid", "test"]}
 
-    def evaluate_c_preds(
+    def evaluate_cas_preds(
         self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
-    ) -> Tuple[torch.Tensor, Dict[str, Any], Dict[str, Any]]:
-        self._validate_preds(preds)
-        res_result, _ = cas_fn(self.data, preds, self.split_idx, **cas_params)
-        split_acc = {
-            split: self._eval(res_result, split)["acc"]
-            for split in ["train", "valid", "test"]
-        }
-        split_correct = {
-            split: self._eval(res_result, split)["correct"]
-            for split in ["train", "valid", "test"]
-        }
-        return res_result, split_acc, split_correct
-
-    def evaluate_s_preds(
-        self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
-    ) -> Tuple[torch.Tensor, Dict[str, Any], Dict[str, Any]]:
+    ) -> Dict[str, float]:
         self._validate_preds(preds)
         _, result = cas_fn(self.data, preds, self.split_idx, **cas_params)
-        split_acc = {
-            split: self._eval(result, split)["acc"]
-            for split in ["train", "valid", "test"]
+        return {
+            split: self._eval(result, split) for split in ["train", "valid", "test"]
         }
-        split_correct = {
-            split: self._eval(result, split)["correct"]
-            for split in ["train", "valid", "test"]
-        }
-        return result, split_acc, split_correct
-
-    # def evaluate_cas_preds(
-    #     self, preds: torch.Tensor, cas_params: Dict[str, Any], cas_fn: _CaSFnType
-    # ) -> Dict[str, float]:
-    #     self._validate_preds(preds)
-    #     _, result = cas_fn(self.data, preds, self.split_idx, **cas_params)
-    #     return {
-    #         split: self._eval(result, split) for split in ["train", "valid", "test"]
-    #     }
 
     def _validate_preds(self, preds: torch.Tensor):
         if (preds.sum(dim=-1) - 1).abs().max() > 1e-1:
